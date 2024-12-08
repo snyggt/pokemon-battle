@@ -25,11 +25,11 @@ Simple backlog to keep track of the project progress
 
 - [x] Define project workspace structure [project-structure.md](/docs/project-structure.md)
 - [x] setup monorepo structure
-- [ ] setup configuration
-- [ ] For each workspace
-  - [ ] Setup build configuration
-  - [ ] Setup lint / style configuration
-  - [ ] Setup test configuration
+- [x] setup configuration
+- [x] For each workspace
+  - [x] Setup build configuration
+  - [x] Setup lint / style configuration
+  - [x] Setup test configuration
 
 ### Features
 
