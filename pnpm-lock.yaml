@@ -7,3 +7,15 @@ settings:
 importers:
 
   .: {}
+
+  interfaces/rest-api: {}
+
+  modules/app:
+    dependencies:
+      '@snyggt/pokemon-battle-domain':
+        specifier: workspace:*
+        version: link:../domain
+
+  modules/domain: {}
+
+  modules/infra: {}
