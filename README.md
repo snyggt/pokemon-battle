@@ -24,7 +24,7 @@ Simple backlog to keep track of the project progress
 ### Boilerplating
 
 - [x] Define project workspace structure [project-structure.md](/docs/project-structure.md)
-- [ ] setup monorepo structure
+- [x] setup monorepo structure
 - [ ] setup configuration
 - [ ] For each workspace
   - [ ] Setup build configuration
