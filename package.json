@@ -2,7 +2,7 @@
   "name": "@snyggt/pokemon-battle",
   "version": "1.0.0",
   "description": "Pokemon Battle Game",
-  "private": "true",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "echo \"Error: no build script specified\" && exit 1",
