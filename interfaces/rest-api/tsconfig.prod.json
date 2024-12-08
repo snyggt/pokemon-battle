@@ -1,0 +1,3 @@
+{
+	"extends": "@snyggt/base/ts-prod"
+}

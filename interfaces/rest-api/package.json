@@ -6,16 +6,19 @@
 	"scripts": {
 		"test": "jest",
 		"test:watch": "jest --watch",
-		"build": "tsc",
+		"build": "tsup",
 		"lint": "eslint",
 		"lint:fix": "eslint --fix"
 	},
 	"dependencies": {
-		"@snyggt/pokemon-battle-infra": "workspace:*",
-		"@snyggt/pokemon-battle-app": "workspace:*"
+		"@snyggt/pokemon-battle-app": "workspace:*",
+		"@snyggt/pokemon-battle-infra": "workspace:*"
 	},
 	"prettier": "@snyggt/base/prettier",
 	"keywords": [],
 	"author": "Erik Hansson",
-	"license": "MIT"
+	"license": "MIT",
+	"devDependencies": {
+		"tsup": "^8.3.5"
+	}
 }
