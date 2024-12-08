@@ -4,10 +4,20 @@
   "description": "Pokemon Battle Game",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"Error: no build script specified\" && exit 1",
-    "dev": "echo \"Error: no dev script specified\" && exit 1",
-    "lint": "echo \"Error: no lint script specified\" && exit 1"
+    "test": "pnpm -r run test",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint:fix"
+  },
+  "devDependencies": {
+    "@snyggt/base": "0.0.2",
+    "@types/jest": "29.5.14",
+    "@types/node": "22.8.4",
+    "eslint": "9.13.0",
+    "jest": "29.7.0",
+    "prettier": "3.3.3",
+    "ts-jest": "^29.2.5",
+    "typescript": "5.6.3"
   },
   "keywords": [],
   "author": "Erik Hansson",

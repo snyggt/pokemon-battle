@@ -1,19 +1,21 @@
 {
-  "name": "@snyggt/pokemon-battle-rest-api",
-  "version": "1.0.0",
-  "description": "Pokemon Battle Api - Responsible for handling http request and map it to commands and queries from pokemon-battle-app",
-  "private": true,
-  "scripts": {
-    "dev": "echo \"Error: no build script specified\" && exit 1",
-    "build": "echo \"Error: no build script specified\" && exit 1",
-    "lint": "echo \"Error: no lint script specified\" && exit 1",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "@snyggt/pokemon-battle-infra": "workspace:*",
-    "@snyggt/pokemon-battle-app": "workspace:*"
-  },
-  "keywords": [],
-  "author": "Erik Hansson",
-  "license": "MIT"
+	"name": "@snyggt/pokemon-battle-rest-api",
+	"version": "1.0.0",
+	"description": "Pokemon Battle Api - Responsible for handling http request and map it to commands and queries from pokemon-battle-app",
+	"private": true,
+	"scripts": {
+		"test": "jest",
+		"test:watch": "jest --watch",
+		"build": "tsc",
+		"lint": "eslint",
+		"lint:fix": "eslint --fix"
+	},
+	"dependencies": {
+		"@snyggt/pokemon-battle-infra": "workspace:*",
+		"@snyggt/pokemon-battle-app": "workspace:*"
+	},
+	"prettier": "@snyggt/base/prettier",
+	"keywords": [],
+	"author": "Erik Hansson",
+	"license": "MIT"
 }

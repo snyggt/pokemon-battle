@@ -1,0 +1,4 @@
+{
+	"extends": "@snyggt/base/ts-base",
+	"compilerOptions": { "noEmit": true }
+}

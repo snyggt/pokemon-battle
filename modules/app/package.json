@@ -1,16 +1,20 @@
 {
-  "name": "@snyggt/pokemon-battle-app",
-  "version": "1.0.0",
-  "description": "Pokemon Battle App - Responsible for running app commands and queries",
-  "private": true,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "echo \"Error: no lint script specified\" && exit 1"
-  },
-  "dependencies": {
-    "@snyggt/pokemon-battle-domain": "workspace:*"
-  },
-  "keywords": [],
-  "author": "Erik Hansson",
-  "license": "MIT"
+	"name": "@snyggt/pokemon-battle-app",
+	"version": "1.0.0",
+	"description": "Pokemon Battle App - Responsible for running app commands and queries",
+	"private": true,
+	"scripts": {
+		"test": "jest",
+		"test:watch": "jest --watch",
+		"build": "tsc",
+		"lint": "eslint",
+		"lint:fix": "eslint --fix"
+	},
+	"dependencies": {
+		"@snyggt/pokemon-battle-domain": "workspace:*"
+	},
+	"prettier": "@snyggt/base/prettier",
+	"keywords": [],
+	"author": "Erik Hansson",
+	"license": "MIT"
 }
