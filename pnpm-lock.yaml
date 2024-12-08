@@ -8,7 +8,14 @@ importers:
 
   .: {}
 
-  interfaces/rest-api: {}
+  interfaces/rest-api:
+    dependencies:
+      '@snyggt/pokemon-battle-app':
+        specifier: workspace:*
+        version: link:../../modules/app
+      '@snyggt/pokemon-battle-infra':
+        specifier: workspace:*
+        version: link:../../modules/infra
 
   modules/app:
     dependencies:
