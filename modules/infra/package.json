@@ -1,0 +1,13 @@
+{
+  "name": "@snyggt/pokemon-battle-infra",
+  "version": "1.0.0",
+  "description": "Pokemon Battle Infra - Responsible for implementing adapters for app and domain layer ports",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"Error: no lint script specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Erik Hansson",
+  "license": "MIT"
+}
