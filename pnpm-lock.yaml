@@ -18,4 +18,11 @@ importers:
 
   modules/domain: {}
 
-  modules/infra: {}
+  modules/infra:
+    dependencies:
+      '@snyggt/pokemon-battle-app':
+        specifier: workspace:*
+        version: link:../app
+      '@snyggt/pokemon-battle-domain':
+        specifier: workspace:*
+        version: link:../domain

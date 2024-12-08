@@ -7,6 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"Error: no lint script specified\" && exit 1"
   },
+  "dependencies": {
+    "@snyggt/pokemon-battle-domain": "workspace:*",
+    "@snyggt/pokemon-battle-app": "workspace:*"
+  },
   "keywords": [],
   "author": "Erik Hansson",
   "license": "MIT"
