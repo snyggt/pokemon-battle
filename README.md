@@ -34,8 +34,8 @@ Simple backlog to keep track of the project progress
 ### Features
 
 1. [ ] Battle Simulation
-   - [ ] add CreateBattleSimulation command handler and implement simulation
-   - [ ] create a battle new battle with teams and a trainer
+   - [x] add CreateBattleSimulation command handler and implement simulation
+   - [ ] create new battle with teams and a trainer
    - [ ] enforce battle rules required to run simulation until one team looses
    - [ ] enforce multiplier combat rules
    - [ ] enforce weekness combat rules
