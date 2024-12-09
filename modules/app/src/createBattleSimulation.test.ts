@@ -33,5 +33,11 @@ describe('given a valid CreateBattleSimulation command', () => {
 
 			expect(result.losingTeam).toBeDefined()
 		})
+
+		test('then simulation result includes a status', async () => {
+			const result = await createBattleSimulation(validCommand)
+
+			expect(result.status).toBeDefined()
+		})
 	})
 })
