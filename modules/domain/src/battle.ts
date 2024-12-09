@@ -11,22 +11,20 @@ export const battle = () => {
 				return
 			}
 
-			if (!hasError()) {
-				battleState.homeTeam = {
-					trainer: {
-						name: team.trainer.name,
-					},
-					pokemons: team.pokemons.map(pokemon => {
-						return {
-							pokedexId: pokemon.pokedexId,
-							name: pokemon.name,
-							types: pokemon.types,
-							weaknesses: pokemon.weaknesses,
-							multipliers: pokemon.multipliers,
-							health: startHealth,
-						}
-					}),
-				}
+			battleState.homeTeam = {
+				trainer: {
+					name: team.trainer.name,
+				},
+				pokemons: team.pokemons.map(pokemon => {
+					return {
+						pokedexId: pokemon.pokedexId,
+						name: pokemon.name,
+						types: pokemon.types,
+						weaknesses: pokemon.weaknesses,
+						multipliers: pokemon.multipliers,
+						health: startHealth,
+					}
+				}),
 			}
 		},
 		get gameCompleted() {
@@ -101,8 +99,52 @@ const isValidTeam = (
 		})
 		return false
 	}
+	if (team.pokemons.some(pokemon => !Array.isArray(pokemon.types))) {
+		onError?.({
+			type: 'validation',
+			message: 'Pokemon types field must be an array',
+		})
+		return false
+	}
+
+	if (team.pokemons.some(pokemon => pokemon.types.length < 1)) {
+		onError?.({
+			type: 'validation',
+			message: 'Pokemon types field must have at least one type',
+		})
+		return false
+	}
+
+	if (team.pokemons.some(pokemon => !pokemon.types.every(isValidType))) {
+		onError?.({
+			type: 'validation',
+			message: `Pokemon types field must only include the following types: ${validTypes.join(', ')}`,
+		})
+		return false
+	}
+
 	return true
 }
+
+const validTypes = [
+	'Grass',
+	'Poison',
+	'Fire',
+	'Flying',
+	'Water',
+	'Bug',
+	'Normal',
+	'Electric',
+	'Ground',
+	'Fighting',
+	'Psychic',
+	'Rock',
+	'Ice',
+	'Ghost',
+	'Dragon',
+]
+const isValidType = <T>(val: unknown | T): val is string =>
+	typeof val === 'string' && validTypes.includes(val)
 
 const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>
 	typeof val === 'string' && val.trim().length > 0
