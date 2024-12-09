@@ -1,5 +1,6 @@
+const startHealth = 1000
+
 export const battle = () => {
-	const startHealth = 1000
 	const battleState: BattleState = { gameCompleted: false }
 	const errors: BattleError[] = []
 	const hasError = () => errors.length > 0
@@ -12,23 +13,8 @@ export const battle = () => {
 				return
 			}
 
-			battleState.homeTeam = {
-				trainer: {
-					name: team.trainer.name,
-				},
-				pokemons: team.pokemons.map(pokemon => {
-					return {
-						pokedexId: pokemon.pokedexId,
-						name: pokemon.name,
-						types: pokemon.types,
-						weaknesses: pokemon.weaknesses,
-						multipliers: pokemon.multipliers,
-						health: startHealth,
-					}
-				}),
-			}
+			battleState.homeTeam = toBattleActiveTeam(team)
 		},
-
 		addAwayTeam(team: Team) {
 			const pushError = (e: BattleError) =>
 				errors.push({ ...e, message: 'awayTeam: ' + e.message })
@@ -36,21 +22,7 @@ export const battle = () => {
 				return
 			}
 
-			battleState.awayTeam = {
-				trainer: {
-					name: team.trainer.name,
-				},
-				pokemons: team.pokemons.map(pokemon => {
-					return {
-						pokedexId: pokemon.pokedexId,
-						name: pokemon.name,
-						types: pokemon.types,
-						weaknesses: pokemon.weaknesses,
-						multipliers: pokemon.multipliers,
-						health: startHealth,
-					}
-				}),
-			}
+			battleState.awayTeam = toBattleActiveTeam(team)
 		},
 		get gameCompleted() {
 			return battleState.gameCompleted
@@ -63,6 +35,22 @@ export const battle = () => {
 		},
 	}
 }
+
+const toBattleActiveTeam = (team: Team) => ({
+	trainer: {
+		name: team.trainer.name,
+	},
+	pokemons: team.pokemons.map(pokemon => {
+		return {
+			pokedexId: pokemon.pokedexId,
+			name: pokemon.name,
+			types: pokemon.types,
+			weaknesses: pokemon.weaknesses || [],
+			multipliers: pokemon.multipliers || [],
+			health: startHealth,
+		}
+	}),
+})
 
 const isPartial = <T extends object>(val: unknown | T): val is Partial<T> =>
 	typeof val === 'object' && val !== null && !(val instanceof Error)
@@ -143,7 +131,7 @@ const isValidTeam = (
 	if (team.pokemons.some(pokemon => !pokemon.types.every(isValidType))) {
 		onError?.({
 			type: 'validation',
-			message: `Pokemon types field must only include the following types: ${validTypes.join(', ')}`,
+			message: `Pokemon types field must only include the following types: ${validPokemonTypes.join(', ')}`,
 		})
 		return false
 	}
@@ -168,7 +156,7 @@ const isValidTeam = (
 	) {
 		onError?.({
 			type: 'validation',
-			message: `Pokemon weaknesses if defined must only include any of the following types: ${validTypes.join(', ')}`,
+			message: `Pokemon weaknesses if defined must only include any of the following types: ${validPokemonTypes.join(', ')}`,
 		})
 		return false
 	}
@@ -207,10 +195,11 @@ const isValidTeam = (
 		})
 		return false
 	}
+
 	return true
 }
 
-const validTypes = [
+const validPokemonTypes = [
 	'Grass',
 	'Poison',
 	'Fire',
@@ -227,8 +216,9 @@ const validTypes = [
 	'Ghost',
 	'Dragon',
 ]
+
 const isValidType = <T>(val: unknown | T): val is string =>
-	typeof val === 'string' && validTypes.includes(val)
+	typeof val === 'string' && validPokemonTypes.includes(val)
 
 const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>
 	typeof val === 'string' && val.trim().length > 0
@@ -248,7 +238,7 @@ export interface Team {
 export interface Pokemon {
 	name: string
 	pokedexId: number
-	multipliers: number[]
+	multipliers?: number[]
 	weaknesses?: string[]
 	types: string[]
 }
@@ -257,7 +247,12 @@ interface Trainer {
 	name: string
 }
 
-interface BattleActivePokemon extends Pokemon {
+interface BattleActivePokemon {
+	name: string
+	pokedexId: number
+	multipliers: number[]
+	weaknesses: string[]
+	types: string[]
 	health: number
 }
 
