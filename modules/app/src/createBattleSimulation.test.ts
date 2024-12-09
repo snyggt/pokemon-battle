@@ -14,10 +14,18 @@ describe('given a valid CreateBattleSimulation command', () => {
 			pokemons: [{ pokedexId: 1 }, { pokedexId: 1 }, { pokedexId: 1 }],
 		},
 	}
+
 	describe('when simulation runns to success', () => {
-		it('then a battle log should be returned', () => {
-			const result = createBattleSimulation(validCommand)
+		test('then result should include a battleLog', async () => {
+			const result = await createBattleSimulation(validCommand)
+
 			expect(result.battleLog).toBeDefined()
+		})
+
+		test('then a winning team should include a winning team', async () => {
+			const result = await createBattleSimulation(validCommand)
+
+			expect(result.winningTeam).toBeDefined()
 		})
 	})
 })

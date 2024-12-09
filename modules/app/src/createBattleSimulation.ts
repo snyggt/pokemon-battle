@@ -4,17 +4,24 @@ export interface CreateBattleSimulationCommand {
 }
 
 export interface CreateBattleSimulationResult {
-	battleLog: Team
-	awayTeam: Team
+	battleLog: BattleLogRecord[]
+	winningTeam: Team
 }
 
-export const createBattleSimulation = (
+export const createBattleSimulation = async (
 	_command: CreateBattleSimulationCommand
-) => {
-	return { battleLog: [{ event: 'battle started' }] }
+): Promise<CreateBattleSimulationResult> => {
+	return {
+		battleLog: [{ event: 'battle started' }],
+		winningTeam: _command.awayTeam,
+	}
 }
 
 interface Team {
 	trainerId: string
 	pokemons: { pokedexId: number }[]
+}
+
+interface BattleLogRecord {
+	event: string
 }
