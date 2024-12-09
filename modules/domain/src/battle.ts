@@ -27,7 +27,7 @@ export const battle = () => {
 				return
 			}
 
-			if (!!battleState.homeTeam) {
+			if (battleState.homeTeam) {
 				pushError('addHomeTeam')({
 					message: 'team already exists',
 					type: 'forbidden',
@@ -42,7 +42,7 @@ export const battle = () => {
 				return
 			}
 
-			if (!!battleState.awayTeam) {
+			if (battleState.awayTeam) {
 				pushError('addAwayTeam')({
 					message: 'team already exists',
 					type: 'forbidden',
