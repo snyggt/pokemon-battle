@@ -36,11 +36,14 @@ Simple backlog to keep track of the project progress
 1. [ ] Battle Simulation
    - [x] add CreateBattleSimulation command handler and implement simulation
    - [x] create new battle with teams and a trainer
-   - [ ] enforce battle rules required to run simulation until one team looses
-   - [ ] enforce multiplier combat rules
-   - [ ] enforce weekness combat rules
+   - [x] enforce battle rules required to run simulation until one team looses
+   - [x] enforce multiplier combat rules
+   - [x] enforce weekness combat rules
+   - [ ] generate Battle events
+   - [ ] map battle events to BattleLog
    - [ ] add PokemonService port to fetch pokemon data to be used to initiate battle
    - [ ] implement InMemoryPokemonService adapter that to serve a inmemory pokemon dataset
+   - [ ] implement /api/v1/post/battle {simulate:true}
 
 ### Nice To Have Features
 
