@@ -3,7 +3,7 @@ import { battle, Team, Pokemon } from './battle'
 export const validPokemon: (overrides?: Partial<Pokemon>) => Pokemon = ({
 	pokedexId = 2,
 	name = 'Testimon',
-	multipliers = [],
+	multipliers = [1.1],
 	types = ['Fire'],
 	weaknesses = [],
 } = {}) => ({
@@ -92,6 +92,10 @@ describe('given a new battle', () => {
 			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), weaknesses: 'invalid' }] }}         | ${'Optional Pokemon field weaknesses must be an array if defined'}
 			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), weaknesses: ['invalid'] }] }}       | ${'Pokemon weaknesses if defined must only include any of the following types: Grass, Poison, Fire, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon'}
 			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), weaknesses: ['Fire', 'Coder'] }] }} | ${'Pokemon weaknesses if defined must only include any of the following types: Grass, Poison, Fire, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon'}
+			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), multipliers: null }] }}             | ${'Optional Pokemon field multipliers field must be an array if defined'}
+			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), multipliers: 'invalid' }] }}        | ${'Optional Pokemon field multipliers field must be an array if defined'}
+			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), multipliers: [0] }] }}              | ${'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000'}
+			${{ ...team(), pokemons: [...twoValidPokemon, { ...validPokemon(), multipliers: [1.3, 0] }] }}         | ${'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000'}
 		`(
 			'then "$invalidTeam" should cause error with message $expectedError',
 			async ({ invalidTeam, expectedError }) => {

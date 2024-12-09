@@ -148,6 +148,40 @@ const isValidTeam = (
 		return false
 	}
 
+	if (
+		team.pokemons.some(
+			pokemon =>
+				!(
+					Array.isArray(pokemon.multipliers) ||
+					pokemon.multipliers === undefined
+				)
+		)
+	) {
+		onError?.({
+			type: 'validation',
+			message:
+				'Optional Pokemon field multipliers field must be an array if defined',
+		})
+		return false
+	}
+
+	if (
+		team.pokemons.some(
+			pokemon =>
+				!!pokemon.multipliers &&
+				!pokemon.multipliers.every(
+					multiplier =>
+						typeof multiplier === 'number' && multiplier > 0 && multiplier <= 5
+				)
+		)
+	) {
+		onError?.({
+			type: 'validation',
+			message:
+				'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000',
+		})
+		return false
+	}
 	return true
 }
 
