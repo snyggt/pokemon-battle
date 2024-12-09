@@ -64,14 +64,14 @@ const resolveTeam = ({
 		trainer: { name: trainerName },
 		pokemons: command.homeTeam.pokemons.map(pokemonDto => {
 			const pokemon = pokemons.find(
-				pokmeon => pokmeon.id === pokemonDto.pokedexId
+				pokmeon => pokmeon.pokedexId === pokemonDto.pokedexId
 			)
 
 			assert(pokemon, 'Pokemon not found in map')
 			return {
 				name: pokemon.name,
-				pokedexId: pokemon.id,
-				types: pokemon.type,
+				pokedexId: pokemon.pokedexId,
+				types: pokemon.types,
 				multipliers: pokemon.multipliers || undefined,
 				weaknesses: pokemon.weaknesses || undefined,
 			}
@@ -149,11 +149,11 @@ interface PokemonService {
 }
 
 interface Pokemon {
-	id: number
+	pokedexId: number
 	num: string
 	name: string
 	img: string
-	type: string[]
+	types: string[]
 	height: string
 	weight: string
 	candy: string
@@ -161,6 +161,6 @@ interface Pokemon {
 	spawn_chance: number
 	avg_spawns: number
 	spawn_time: string
-	multipliers: null | number[]
-	weaknesses: null | []
+	multipliers?: number[]
+	weaknesses?: number[]
 }
