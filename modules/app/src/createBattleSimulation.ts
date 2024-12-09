@@ -6,6 +6,7 @@ export interface CreateBattleSimulationCommand {
 export interface CreateBattleSimulationResult {
 	battleLog: BattleLogRecord[]
 	winningTeam: Team
+	losingTeam: Team
 }
 
 export const createBattleSimulation = async (
@@ -14,6 +15,7 @@ export const createBattleSimulation = async (
 	return {
 		battleLog: [{ event: 'battle started' }],
 		winningTeam: _command.awayTeam,
+		losingTeam: _command.homeTeam,
 	}
 }
 
