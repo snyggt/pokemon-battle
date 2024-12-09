@@ -14,16 +14,25 @@ export const battle = () => {
 			}
 
 			if (!!battleState.homeTeam) {
-				pushError('homeTeam')({
-					message: 'Home team already exists',
+				pushError('addHomeTeam')({
+					message: 'team already exists',
 					type: 'forbidden',
 				})
+				return
 			}
 
 			battleState.homeTeam = toBattleActiveTeam(team)
 		},
 		addAwayTeam(team: Team) {
 			if (!isValidTeam(team, { onError: pushError('awayTeam') })) {
+				return
+			}
+
+			if (!!battleState.awayTeam) {
+				pushError('addAwayTeam')({
+					message: 'team already exists',
+					type: 'forbidden',
+				})
 				return
 			}
 

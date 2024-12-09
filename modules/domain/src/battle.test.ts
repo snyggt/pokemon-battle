@@ -42,7 +42,7 @@ describe('given a new battle', () => {
 		})
 	})
 
-	describe('when adding a valid homeTeam if homeTeam already added', () => {
+	describe('when adding a valid home team if home team already exists', () => {
 		test('then a forbidden error should exist', async () => {
 			const testBattle = battle()
 
@@ -51,7 +51,24 @@ describe('given a new battle', () => {
 
 			expect(testBattle.errors).toEqual([
 				{
-					message: 'homeTeam: Home team already exists',
+					message: 'addHomeTeam: team already exists',
+					type: 'forbidden',
+				},
+			])
+			expect(testBattle.hasError).toBe(true)
+		})
+	})
+
+	describe('when adding a valid away team if away team already exists', () => {
+		test('then a forbidden error should exist', async () => {
+			const testBattle = battle()
+
+			testBattle.addAwayTeam(team())
+			testBattle.addAwayTeam(team())
+
+			expect(testBattle.errors).toEqual([
+				{
+					message: 'addAwayTeam: team already exists',
 					type: 'forbidden',
 				},
 			])
