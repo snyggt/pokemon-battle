@@ -1,7 +1,6 @@
 import { EOL } from 'os'
 
 export const rethrow = (msg: string) => (e: Error) => {
-	console.log(e.message)
 	throw aggregateError(e, msg)
 }
 
