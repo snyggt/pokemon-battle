@@ -20,10 +20,10 @@ export const team: () => Team = () => ({
 })
 
 describe('given a new battle', () => {
-	test('then game should not be completed', async () => {
+	test('then game should not be ended', async () => {
 		const testBattle = battle()
 
-		expect(testBattle.gameCompleted).toBe(false)
+		expect(testBattle.ended).toBe(false)
 	})
 
 	test('then no errors should exist', async () => {

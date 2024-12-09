@@ -26,7 +26,7 @@ export const createBattleSimulationHandler = ({ pokemonService }: Services) =>
 		const battleSimulation = battle()
 
 		runSimulation({
-			shouldContinue: () => battleSimulation.gameCompleted,
+			shouldContinue: () => battleSimulation.ended,
 			onSimulationTick: () => {
 				// do simulation here
 			},

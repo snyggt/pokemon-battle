@@ -1,7 +1,7 @@
 const startHealth = 1000
 
 export const battle = () => {
-	const battleState: BattleState = { gameCompleted: false }
+	const battleState: BattleState = { ended: false }
 	const errors: BattleError[] = []
 	const hasError = () => errors.length > 0
 
@@ -24,8 +24,8 @@ export const battle = () => {
 
 			battleState.awayTeam = toBattleActiveTeam(team)
 		},
-		get gameCompleted() {
-			return battleState.gameCompleted
+		get ended() {
+			return battleState.ended
 		},
 		get hasError() {
 			return hasError()
@@ -259,5 +259,5 @@ interface BattleActivePokemon {
 interface BattleState {
 	homeTeam?: { trainer?: Trainer; pokemons?: BattleActivePokemon[] }
 	awayTeam?: { trainer?: Trainer; pokemons?: BattleActivePokemon[] }
-	gameCompleted: boolean
+	ended: boolean
 }
