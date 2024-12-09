@@ -7,11 +7,8 @@ export const battle = () => {
 		turn: undefined,
 	}
 	const pokemonsById = new Map<string, BattleActivePokemon>()
-	const teamByTrainerName = new Map<
-		string,
-		'homeTeam' | 'homeTeamOponent' | 'awayTeam' | 'awayTeamOponent'
-	>()
-	const pokemonsByTeam = new Map<string, BattleActivePokemon[]>()
+	const teamByTrainerName = new Map<string, TeamType>()
+	const pokemonsByTeam = new Map<TeamType, BattleActivePokemon[]>()
 	const trainerNameByTeam = new Map<TeamType, string>()
 
 	const events: EventEnvelope<BattleEvent>[] = []
@@ -91,6 +88,10 @@ export const battle = () => {
 
 		begin() {
 			assert(pokemonsByTeam.size === 2, 'Battle must have two teams to begin')
+			const awayTeam = pokemonsByTeam.get('awayTeam')
+			const homeTeam = pokemonsByTeam.get('homeTeam')
+			assert(homeTeam, 'Home team missing')
+			assert(awayTeam, 'Away team missing')
 
 			battleState.started = true
 			battleState.turn = {
@@ -98,7 +99,10 @@ export const battle = () => {
 				attackingTeaam: 'homeTeam',
 			}
 
-			addEvent<StartedEvent>({ type: 'started', payload: { battleState } })
+			addEvent<StartedEvent>({
+				type: 'started',
+				payload: { battleState, awayTeam, homeTeam },
+			})
 		},
 
 		get events() {
@@ -423,7 +427,11 @@ export interface TeamJoinedEvent extends EventBase {
 
 export interface StartedEvent extends EventBase {
 	type: 'started'
-	payload: { battleState: BattleState }
+	payload: {
+		battleState: BattleState
+		homeTeam: BattleActivePokemon[]
+		awayTeam: BattleActivePokemon[]
+	}
 }
 
 export interface Team {
