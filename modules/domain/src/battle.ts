@@ -75,6 +75,30 @@ const isValidTeam = (
 		return false
 	}
 
+	if (!Array.isArray(team.pokemons)) {
+		onError?.({
+			type: 'validation',
+			message: 'Team pokemons must be an array',
+		})
+		return false
+	}
+
+	if (!Array.isArray(team.pokemons)) {
+		onError?.({
+			type: 'validation',
+			message: 'Team pokemons must be an array',
+		})
+		return false
+	}
+
+	if (team.pokemons.length !== 3) {
+		onError?.({
+			type: 'validation',
+			message: 'Each team must have three pokemons',
+		})
+		return false
+	}
+
 	return true
 }
 const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>

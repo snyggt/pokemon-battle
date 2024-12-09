@@ -42,30 +42,40 @@ describe('given a new battle', () => {
 		})
 	})
 
+	const arr = (num: number) => Array(num).fill('')
+
 	describe('when adding a invalid home team', () => {
 		test.each`
-			invalidTeam                                         | expectedError
-			${''}                                               | ${'Team must be a object'}
-			${' '}                                              | ${'Team must be a object'}
-			${'      '}                                         | ${'Team must be a object'}
-			${undefined}                                        | ${'Team must be a object'}
-			${null}                                             | ${'Team must be a object'}
-			${true}                                             | ${'Team must be a object'}
-			${false}                                            | ${'Team must be a object'}
-			${1}                                                | ${'Team must be a object'}
-			${0}                                                | ${'Team must be a object'}
-			${Symbol()}                                         | ${'Team must be a object'}
-			${new Error('')}                                    | ${'Team must be a object'}
-			${{}}                                               | ${'Trainer must be a object'}
-			${{ ...validTeam(), trainer: null }}                | ${'Trainer must be a object'}
-			${{ ...validTeam(), trainer: undefined }}           | ${'Trainer must be a object'}
-			${{ ...validTeam(), trainer: 'invalid' }}           | ${'Trainer must be a object'}
-			${{ ...validTeam(), trainer: '' }}                  | ${'Trainer must be a object'}
-			${{ ...validTeam(), trainer: { name: '' } }}        | ${'Trainer name must be a non empty string'}
-			${{ ...validTeam(), trainer: { name: ' ' } }}       | ${'Trainer name must be a non empty string'}
-			${{ ...validTeam(), trainer: { name: null } }}      | ${'Trainer name must be a non empty string'}
-			${{ ...validTeam(), trainer: { name: undefined } }} | ${'Trainer name must be a non empty string'}
-			${{ ...validTeam(), trainer: { name: 1 } }}         | ${'Trainer name must be a non empty string'}
+			invalidTeam                                                       | expectedError
+			${''}                                                             | ${'Team must be a object'}
+			${' '}                                                            | ${'Team must be a object'}
+			${'      '}                                                       | ${'Team must be a object'}
+			${undefined}                                                      | ${'Team must be a object'}
+			${null}                                                           | ${'Team must be a object'}
+			${true}                                                           | ${'Team must be a object'}
+			${false}                                                          | ${'Team must be a object'}
+			${1}                                                              | ${'Team must be a object'}
+			${0}                                                              | ${'Team must be a object'}
+			${Symbol()}                                                       | ${'Team must be a object'}
+			${new Error('')}                                                  | ${'Team must be a object'}
+			${{}}                                                             | ${'Trainer must be a object'}
+			${{ ...validTeam(), trainer: null }}                              | ${'Trainer must be a object'}
+			${{ ...validTeam(), trainer: undefined }}                         | ${'Trainer must be a object'}
+			${{ ...validTeam(), trainer: 'invalid' }}                         | ${'Trainer must be a object'}
+			${{ ...validTeam(), trainer: '' }}                                | ${'Trainer must be a object'}
+			${{ ...validTeam(), trainer: { name: '' } }}                      | ${'Trainer name must be a non empty string'}
+			${{ ...validTeam(), trainer: { name: ' ' } }}                     | ${'Trainer name must be a non empty string'}
+			${{ ...validTeam(), trainer: { name: null } }}                    | ${'Trainer name must be a non empty string'}
+			${{ ...validTeam(), trainer: { name: undefined } }}               | ${'Trainer name must be a non empty string'}
+			${{ ...validTeam(), trainer: { name: 1 } }}                       | ${'Trainer name must be a non empty string'}
+			${{ ...validTeam(), pokemons: null }}                             | ${'Team pokemons must be an array'}
+			${{ ...validTeam(), pokemons: undefined }}                        | ${'Team pokemons must be an array'}
+			${{ ...validTeam(), pokemons: '' }}                               | ${'Team pokemons must be an array'}
+			${{ ...validTeam(), pokemons: true }}                             | ${'Team pokemons must be an array'}
+			${{ ...validTeam(), pokemons: [] }}                               | ${'Each team must have three pokemons'}
+			${{ ...validTeam(), pokemons: arr(1).map(() => validPokemon()) }} | ${'Each team must have three pokemons'}
+			${{ ...validTeam(), pokemons: arr(2).map(() => validPokemon()) }} | ${'Each team must have three pokemons'}
+			${{ ...validTeam(), pokemons: arr(4).map(() => validPokemon()) }} | ${'Each team must have three pokemons'}
 		`(
 			'then "$invalidTeam" should cause error with message $expectedError',
 			async ({ invalidTeam, expectedError }) => {
