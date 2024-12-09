@@ -1,4 +1,4 @@
-import { battle, Team, Pokemon } from './battle'
+import { battle, Team, Pokemon, AttackedEvent } from './battle'
 
 const validPokemon: (overrides?: Partial<Pokemon>) => Pokemon = ({
 	pokedexId = 2,
@@ -23,7 +23,7 @@ describe('given a new battle', () => {
 	test('then game should not be ended', async () => {
 		const testBattle = battle()
 
-		expect(testBattle.currentAttackingTrainer).toBe(undefined)
+		expect(testBattle.currentAttackingTeam).toBe(undefined)
 	})
 
 	test('then battle should not have started', async () => {
@@ -51,13 +51,58 @@ describe('given a new battle - when battle is started', () => {
 		testBattle.addAwayTeam(team('awayTrainer'))
 		testBattle.addHomeTeam(team('homeTrainer'))
 		testBattle.begin()
-		const currentTurnTrainerName = testBattle.currentAttackingTrainer
+		const currentTurnTrainerName = testBattle.currentAttackingTeam
 
-		expect(currentTurnTrainerName).toBe('homeTrainer')
+		expect(currentTurnTrainerName).toBe('homeTeam')
+	})
+
+	test('then two joined events and one started event should have happend', async () => {
+		const testBattle = battle()
+
+		testBattle.addAwayTeam(team('awayTrainer'))
+		testBattle.addHomeTeam(team('homeTrainer'))
+		testBattle.begin()
+		const currentTurnTrainerName = testBattle.currentAttackingTeam
+
+		expect(testBattle.events).toBeDefined()
+		expect(testBattle.events).toEqual([
+			expect.objectContaining({ type: 'team-joined' }),
+			expect.objectContaining({ type: 'team-joined' }),
+			expect.objectContaining({ type: 'started' }),
+		])
+		expect(currentTurnTrainerName).toBe('homeTeam')
 	})
 })
 
-describe('given a new battle - when battle is started - and 10 rounds is played', () => {
+describe('given a new battle - when battle is started - and one attack is made', () => {
+	test('then one attacked event should have happend', async () => {
+		const testBattle = battle()
+
+		testBattle.addAwayTeam(team('awayTrainer'))
+		testBattle.addHomeTeam(team('homeTrainer'))
+		testBattle.begin()
+
+		testBattle.selectTeam('homeTrainer').attack()
+
+		const attackedEvent: Partial<AttackedEvent> = expect.objectContaining({
+			type: 'attacked',
+			id: expect.any(String),
+			payload: expect.objectContaining({
+				damage: 122,
+				turn: 2,
+				attackedPokemon: expect.objectContaining({ health: 878 }),
+			}),
+		})
+		expect(testBattle.events).toEqual([
+			expect.objectContaining({ type: 'team-joined' }),
+			expect.objectContaining({ type: 'team-joined' }),
+			expect.objectContaining({ type: 'started' }),
+			attackedEvent,
+		])
+	})
+})
+
+describe('given a new battle - when battle is started - and multiple rounds is played', () => {
 	test('then one scores should be available', async () => {
 		const testBattle = battle()
 
@@ -76,6 +121,33 @@ describe('given a new battle - when battle is started - and 10 rounds is played'
 	})
 })
 
+describe('given a new battle - when battle is started - and battle is played to finnish', () => {
+	test('then events should be populated', async () => {
+		const testBattle = battle()
+
+		testBattle.addAwayTeam(team('awayTrainer'))
+		testBattle.addHomeTeam(team('homeTrainer'))
+		testBattle.begin()
+
+		new Array(26).fill('').forEach(() => {
+			testBattle.selectTeam('homeTrainer').attack()
+			testBattle.selectTeam('awayTrainer').attack()
+		})
+		testBattle.selectTeam('homeTrainer').attack()
+
+		expect(testBattle.events).toBeDefined()
+		expect(testBattle.events).toEqual([
+			expect.objectContaining({ type: 'team-joined' }),
+			expect.objectContaining({ type: 'team-joined' }),
+			expect.objectContaining({ type: 'started' }),
+			...Array(53)
+				.fill('')
+				.map(() => expect.objectContaining({ type: 'attacked' })),
+			expect.objectContaining({ type: 'ended' }),
+		])
+		expect(testBattle.events.length).toEqual(57)
+	})
+})
 describe('given a new battle - when battle is started - combat rules should be applied', () => {
 	test.each`
 		multipliers           | weaknesses                             | attackerTypes                          | expectedDamage
@@ -149,7 +221,7 @@ describe('given a new battle - battle has started - when checking currentAttacki
 		testBattle.addHomeTeam(homeTeam)
 		testBattle.begin()
 
-		expect(testBattle.currentAttackingTrainer).toBe(homeTeam.trainer.name)
+		expect(testBattle.currentAttackingTeam).toBe('homeTeam')
 	})
 })
 
@@ -165,27 +237,8 @@ describe('given a new battle - and battle has started - and home team trainer co
 		testBattle.begin()
 		testBattle.selectTeam(homeTeam.trainer.name).attack()
 
-		expect(testBattle.currentAttackingTrainer).toBe(awayTeam.trainer.name)
+		expect(testBattle.currentAttackingTeam).toBe('awayTeam')
 		expect(testBattle.currentTurn).toBe(2)
-	})
-
-	test('then the oponent teams active pokemon health should be lower than before the attack', async () => {
-		const homeTeam = team('homeTrainer')
-		const awayTeam = team('awayTrainer')
-
-		const testBattle = battle()
-		testBattle.addAwayTeam(awayTeam)
-		testBattle.addHomeTeam(homeTeam)
-		testBattle.begin()
-		const teamActions = testBattle.selectTeam(homeTeam.trainer.name)
-		const oponentPokemonHealthBefore = teamActions.oponentPokemonHealth
-		teamActions.attack()
-
-		expect(testBattle.currentAttackingTrainer).toBe(awayTeam.trainer.name)
-		expect(testBattle.currentTurn).toBe(2)
-		expect(teamActions.oponentPokemonHealth).toBeLessThan(
-			oponentPokemonHealthBefore
-		)
 	})
 })
 

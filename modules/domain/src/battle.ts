@@ -1,111 +1,113 @@
+import { randomUUID } from 'crypto'
 import { panic } from './errorHandling'
 
 export const battle = () => {
 	const battleState: BattleState = {
-		ended: false,
 		started: false,
-		awayTeam: undefined,
-		homeTeam: undefined,
 		turn: undefined,
+	}
+	const pokemonsById = new Map<string, BattleActivePokemon>()
+	const teamByTrainerName = new Map<
+		string,
+		'homeTeam' | 'homeTeamOponent' | 'awayTeam' | 'awayTeamOponent'
+	>()
+	const pokemonsByTeam = new Map<string, BattleActivePokemon[]>()
+	const trainerNameByTeam = new Map<TeamType, string>()
+
+	const events: EventEnvelope<BattleEvent>[] = []
+	const addEvent = <T extends BattleEvent>(e: T) => {
+		const eventEnvelope: EventEnvelope<T> = Object.freeze({
+			type: e.type,
+			payload: Object.freeze({ ...e.payload }),
+			id: randomUUID(),
+			revision: events.length + 1,
+			timestamp: new Date(),
+		})
+
+		events.push(eventEnvelope)
 	}
 
 	const ended = () =>
 		[
-			!hasPokemonLeft(battleState.awayTeam),
-			!hasPokemonLeft(battleState.homeTeam),
+			!hasPokemonLeft(pokemonsByTeam.get('awayTeam')),
+			!hasPokemonLeft(pokemonsByTeam.get('homeTeam')),
 		].some(Boolean)
 
 	return {
 		addHomeTeam(team: Team) {
 			assertValidTeam(team)
-			assertTeamsHaveDifferentTrainerNames(
-				battleState.awayTeam,
-				team.trainer.name
+			const awayTrainer = trainerNameByTeam.get('awayTeam')
+			assertTeamsHaveDifferentTrainerNames(awayTrainer, team.trainer.name)
+			assert(
+				!teamByTrainerName.get(team.trainer.name),
+				'Home team cannot be added twise'
 			)
-			assert(!battleState.homeTeam, 'Home team cannot be added twise')
 
-			battleState.homeTeam = toBattleActiveTeam(team)
+			const battleTeam = toBattleActiveTeam(team, 'homeTeam')
+
+			pokemonsByTeam.set('homeTeam', battleTeam.pokemons)
+			trainerNameByTeam.set('homeTeam', battleTeam.trainer.name)
+			teamByTrainerName.set(battleTeam.trainer.name, 'homeTeam')
+			battleTeam.pokemons.forEach(pokemon =>
+				pokemonsById.set(pokemon.id, pokemon)
+			)
+
+			addEvent<TeamJoinedEvent>({
+				type: 'team-joined',
+				payload: {
+					teamType: 'homeTeam',
+					pokemons: battleTeam.pokemons,
+					trainer: battleTeam.trainer,
+				},
+			})
 		},
 
 		addAwayTeam(team: Team) {
 			assertValidTeam(team)
-			assertTeamsHaveDifferentTrainerNames(
-				battleState.homeTeam,
-				team.trainer.name
-			)
-			assert(!battleState.awayTeam, 'Away team cannot be added twise')
+			const homeTrainer = trainerNameByTeam.get('homeTeam')
+			const awayTrainer = trainerNameByTeam.get('awayTeam')
+			assertTeamsHaveDifferentTrainerNames(homeTrainer, team.trainer.name)
+			assert(!awayTrainer, 'Away team cannot be added twise')
 
-			battleState.awayTeam = toBattleActiveTeam(team)
+			const battleTeam = toBattleActiveTeam(team, 'awayTeam')
+
+			pokemonsByTeam.set('awayTeam', battleTeam.pokemons)
+			teamByTrainerName.set(battleTeam.trainer.name, 'awayTeam')
+			pokemonsByTeam.set('awayTeam', battleTeam.pokemons)
+			trainerNameByTeam.set('awayTeam', battleTeam.trainer.name)
+			battleTeam.pokemons.forEach(pokemon =>
+				pokemonsById.set(pokemon.id, pokemon)
+			)
+
+			addEvent<TeamJoinedEvent>({
+				type: 'team-joined',
+				payload: {
+					teamType: 'awayTeam',
+					pokemons: battleTeam.pokemons,
+					trainer: battleTeam.trainer,
+				},
+			})
 		},
 
 		begin() {
-			assert(
-				battleState.awayTeam && battleState.homeTeam,
-				'Battle must have two teams to begin'
-			)
+			assert(pokemonsByTeam.size === 2, 'Battle must have two teams to begin')
 
 			battleState.started = true
-			battleState.turn = { count: 1, attacker: battleState.homeTeam.trainer }
+			battleState.turn = {
+				count: 1,
+				attackingTeaam: 'homeTeam',
+			}
+
+			addEvent<StartedEvent>({ type: 'started', payload: { battleState } })
 		},
 
-		selectTeam(trainerName: string) {
-			assert(battleState.started, 'Game must start before running team actions')
-			const attackingTeam = [battleState.awayTeam, battleState.homeTeam].find(
-				team => team?.trainer?.name === trainerName
+		get events() {
+			return events.map(e =>
+				Object.freeze({
+					...e,
+					payload: Object.freeze({ ...e.payload }),
+				})
 			)
-			const oponentTeam = [battleState.awayTeam, battleState.homeTeam].find(
-				team => team?.trainer?.name !== trainerName
-			)
-
-			assert(attackingTeam, 'No attacking team found')
-			assert(oponentTeam, 'No oponentTeam team found')
-
-			return {
-				attack: () => {
-					assert(
-						trainerName === battleState.turn?.attacker.name,
-						'Trainer can only attack on its teams turn'
-					)
-					assert(!ended(), 'Trainer cannot attack if battle has ended')
-
-					const oponentPokemon = oponentTeam.pokemons.find(
-						pokemon => pokemon.health > 0
-					)
-
-					const teamPokemon = attackingTeam.pokemons.find(
-						pokemon => pokemon.health > 0
-					)
-
-					assert(oponentPokemon, 'All oponent pokemons has fainted')
-					assert(teamPokemon, 'All oponent pokemons has fainted')
-
-					const calculatedDamage = calculateDamage(oponentPokemon, teamPokemon)
-					oponentPokemon.health -= Math.min(
-						oponentPokemon.health,
-						calculatedDamage
-					)
-					battleState.turn.count += 1
-					battleState.turn.attacker = oponentTeam.trainer
-				},
-				get anyPokemonLeft() {
-					const teamPokemon = attackingTeam.pokemons.find(
-						pokemon => pokemon.health > 0
-					)
-					return !!teamPokemon
-				},
-				get teamPokemonHealth() {
-					const teamPokemon = attackingTeam.pokemons.find(
-						pokemon => pokemon.health > 0
-					)
-					return teamPokemon?.health ?? 0
-				},
-				get oponentPokemonHealth() {
-					const oponentPokemon = oponentTeam.pokemons.find(
-						pokemon => pokemon.health > 0
-					)
-					return oponentPokemon?.health ?? 0
-				},
-			}
 		},
 		get started() {
 			return battleState.started
@@ -118,18 +120,90 @@ export const battle = () => {
 				battleState.started,
 				'Game must start before checking battle scores'
 			)
+			const homeTeam = pokemonsByTeam.get('homeTeam')
+			const awayTeam = pokemonsByTeam.get('awayTeam')
+			assert(homeTeam, 'No homeTeam found')
+			assert(awayTeam, 'No awayTeam found')
 			return {
 				ended: ended(),
-				homeTeam: getTeamSnapshot(battleState.homeTeam),
-				awayTeam: getTeamSnapshot(battleState.awayTeam),
+				homeTeam: getTeamSnapshot(homeTeam),
+				awayTeam: getTeamSnapshot(awayTeam),
 			}
 		},
 		get currentTurn() {
 			assert(battleState.turn, 'Turn not available until battle is started')
 			return battleState.turn.count
 		},
-		get currentAttackingTrainer() {
-			return battleState.turn?.attacker.name
+		get currentAttackingTeam() {
+			return battleState.turn?.attackingTeaam
+		},
+		selectTeam(trainerName: string) {
+			assert(battleState.started, 'Game must start before running team actions')
+			const team = teamByTrainerName.get(trainerName)
+			assert(team, 'No team found')
+			const attackingTeam = pokemonsByTeam.get(team)
+
+			const oponentTeam = pokemonsByTeam.get(
+				team === 'homeTeam' ? 'awayTeam' : 'homeTeam'
+			)
+
+			assert(attackingTeam, 'No attacking team found')
+			assert(oponentTeam, 'No oponentTeam team found')
+
+			return {
+				attack() {
+					assert(
+						team === battleState.turn?.attackingTeaam,
+						'Trainer can only attack on its teams turn'
+					)
+					assert(!ended(), 'Trainer cannot attack if battle has ended')
+
+					const oponentHealthyPokemon = oponentTeam.find(
+						pokemon => pokemon.health > 0
+					)
+
+					const attackingHealthyPokemon = attackingTeam.find(
+						pokemon => pokemon.health > 0
+					)
+
+					assert(oponentHealthyPokemon, 'All oponent pokemons has fainted')
+					assert(attackingHealthyPokemon, 'All oponent pokemons has fainted')
+					assert(battleState.turn, 'All oponent pokemons has fainted')
+
+					const damage = calculateDamage(
+						oponentHealthyPokemon,
+						attackingHealthyPokemon
+					)
+					const calculatedDamage = Math.min(
+						oponentHealthyPokemon.health,
+						damage
+					)
+
+					oponentHealthyPokemon.health -= calculatedDamage
+					battleState.turn.count += 1
+					battleState.turn.attackingTeaam = oponentHealthyPokemon.teamType
+
+					addEvent<AttackedEvent>({
+						type: 'attacked',
+						payload: {
+							damage: calculatedDamage,
+							turn: battleState.turn.count,
+							attackedPokemon: { ...oponentHealthyPokemon },
+							attackedByPokemon: { ...attackingHealthyPokemon },
+						},
+					})
+
+					if (ended()) {
+						addEvent<EndedEvent>({
+							type: 'ended',
+							payload: {
+								battleState,
+								pokemons: [...pokemonsById.values()],
+							},
+						})
+					}
+				},
+			}
 		},
 	}
 }
@@ -140,14 +214,17 @@ export function assert(condition: unknown, message: string): asserts condition {
 	}
 }
 
-const toBattleActiveTeam = (team: Team) => ({
+const toBattleActiveTeam = (team: Team, teamType: 'homeTeam' | 'awayTeam') => ({
 	trainer: {
 		name: team.trainer.name,
 	},
 	pokemons: team.pokemons.map(pokemon => {
 		return {
 			pokedexId: pokemon.pokedexId,
+			id: randomUUID(),
 			name: pokemon.name,
+			teamType,
+			trainerName: team.trainer.name,
 			types: pokemon.types,
 			weaknesses: pokemon.weaknesses || [],
 			multipliers: pokemon.multipliers || [],
@@ -162,11 +239,11 @@ const isPartial = <T extends object>(val: unknown | T): val is Partial<T> =>
 	typeof val === 'object' && val !== null && !(val instanceof Error)
 
 function assertTeamsHaveDifferentTrainerNames(
-	battleTeam: BattleTeam | undefined,
-	trainerName: string
+	firstTrainerName: string | undefined,
+	sedcondTrainerName: string
 ) {
 	assert(
-		!battleTeam?.trainer || trainerName !== battleTeam.trainer.name,
+		!firstTrainerName || sedcondTrainerName !== firstTrainerName,
 		'Team trainers must have different trainer names'
 	)
 }
@@ -243,12 +320,12 @@ function assertValidTeam(team: unknown): asserts team is Team {
 	)
 }
 
-const getTeamSnapshot = (team: BattleTeam | undefined) =>
+const getTeamSnapshot = (pokemons: BattleActivePokemon[]) =>
 	Object.freeze({
-		...team,
-		pokemons: team?.pokemons.map(pokemon => Object.freeze({ ...pokemon })),
+		...pokemons,
+		pokemons: pokemons?.map(pokemon => Object.freeze({ ...pokemon })),
 		activePokemon: Object.freeze({
-			...team?.pokemons.find(p => p.health > 0),
+			...pokemons?.find(p => p.health > 0),
 		}),
 	})
 
@@ -279,8 +356,8 @@ const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>
 const isNumberFrom1to151 = <T>(val: unknown | T): val is number =>
 	typeof val === 'number' && val <= 151 && val >= 1
 
-const hasPokemonLeft = (team: BattleTeam | undefined) =>
-	team?.pokemons.some(p => p.health > 0)
+const hasPokemonLeft = (pokemons: BattleActivePokemon[] | undefined) =>
+	pokemons?.some(p => p.health > 0)
 
 const calculateDamage = (
 	oponent: BattleActivePokemon,
@@ -301,10 +378,54 @@ const calculateDamage = (
 	return Math.round(damageAfterMultipliers * (1 + 1.1 * numberOfWeaknesses))
 }
 
-export interface BattleError {
-	type: 'validation' | 'forbidden'
-	message: string
+interface EventBase {
+	type: string
+	payload: Record<string, unknown>
 }
+
+export interface EventEnvelope<T extends EventBase> {
+	id: string
+	timestamp: Date
+	revision: number
+	payload: T['payload']
+	type: T['type']
+}
+
+export type BattleEvent =
+	| AttackedEvent
+	| StartedEvent
+	| TeamJoinedEvent
+	| EndedEvent
+
+export interface EndedEvent extends EventBase {
+	type: 'ended'
+	payload: { battleState: BattleState; pokemons: BattleActivePokemon[] }
+}
+
+export interface AttackedEvent extends EventBase {
+	type: 'attacked'
+	payload: {
+		attackedPokemon: BattleActivePokemon
+		attackedByPokemon: BattleActivePokemon
+		damage: number
+		turn: number
+	}
+}
+
+export interface TeamJoinedEvent extends EventBase {
+	type: 'team-joined'
+	payload: {
+		teamType: TeamType
+		pokemons: BattleActivePokemon[]
+		trainer: Trainer
+	}
+}
+
+export interface StartedEvent extends EventBase {
+	type: 'started'
+	payload: { battleState: BattleState }
+}
+
 export interface Team {
 	trainer: Trainer
 	pokemons: Pokemon[]
@@ -324,6 +445,9 @@ interface Trainer {
 
 interface BattleActivePokemon {
 	name: string
+	trainerName: string
+	teamType: TeamType
+	id: string
 	pokedexId: number
 	multipliers: number[]
 	weaknesses: string[]
@@ -331,12 +455,9 @@ interface BattleActivePokemon {
 	health: number
 }
 
-type BattleTeam = { trainer: Trainer; pokemons: BattleActivePokemon[] }
+type TeamType = 'homeTeam' | 'awayTeam'
 
 interface BattleState {
-	homeTeam?: BattleTeam
-	awayTeam?: BattleTeam
-	ended: boolean
-	turn?: { count: number; attacker: Trainer }
+	turn?: { count: number; attackingTeaam: TeamType }
 	started: boolean
 }

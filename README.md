@@ -39,7 +39,7 @@ Simple backlog to keep track of the project progress
    - [x] enforce battle rules required to run simulation until one team looses
    - [x] enforce multiplier combat rules
    - [x] enforce weekness combat rules
-   - [ ] generate Battle events
+   - [x] generate Battle events
    - [ ] map battle events to BattleLog
    - [ ] add PokemonService port to fetch pokemon data to be used to initiate battle
    - [ ] implement InMemoryPokemonService adapter that to serve a inmemory pokemon dataset
