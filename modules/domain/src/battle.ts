@@ -4,21 +4,19 @@ export const battle = () => {
 	const battleState: BattleState = { ended: false }
 	const errors: BattleError[] = []
 	const hasError = () => errors.length > 0
+	const pushError = (prefix: string) => (e: BattleError) =>
+		errors.push({ ...e, message: [prefix, e.message].join(': ') })
 
 	return {
 		addHomeTeam(team: Team) {
-			const pushError = (e: BattleError) =>
-				errors.push({ ...e, message: 'homeTeam: ' + e.message })
-			if (!isValidTeam(team, { onError: pushError })) {
+			if (!isValidTeam(team, { onError: pushError('homeTeam') })) {
 				return
 			}
 
 			battleState.homeTeam = toBattleActiveTeam(team)
 		},
 		addAwayTeam(team: Team) {
-			const pushError = (e: BattleError) =>
-				errors.push({ ...e, message: 'awayTeam: ' + e.message })
-			if (!isValidTeam(team, { onError: pushError })) {
+			if (!isValidTeam(team, { onError: pushError('awayTeam') })) {
 				return
 			}
 
