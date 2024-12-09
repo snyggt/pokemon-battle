@@ -1,3 +1,4 @@
+import { assert } from '@snyggt/pokemon-battle-domain/src/battle'
 import {
 	createBattleSimulationHandler,
 	CreateBattleSimulationCommand,
@@ -6,11 +7,11 @@ import {
 beforeEach(() => {
 	pokemonService.getByIds.mockResolvedValue([
 		{
-			id: 1,
+			pokedexId: 1,
 			num: '001',
 			name: 'Bulbasaur',
 			img: 'http://www.serebii.net/pokemongo/pokemon/001.png',
-			type: ['Grass', 'Poison'],
+			types: ['Grass', 'Poison'],
 			height: '0.71 m',
 			weight: '6.9 kg',
 			candy: 'Bulbasaur Candy',
@@ -40,18 +41,21 @@ describe('given a valid CreateBattleSimulation command', () => {
 		test('then simulation result includes a battleLog', async () => {
 			const result = await createBattleSimulation(validCommand)
 
+			assert(result.status === 'success', 'Status is not success')
 			expect(result.battleLog).toBeDefined()
 		})
 
 		test('then simulation result includes a winning team', async () => {
 			const result = await createBattleSimulation(validCommand)
 
+			assert(result.status === 'success', 'Status is not success')
 			expect(result.winningTeam).toBeDefined()
 		})
 
 		test('then simulation result includes a losing team', async () => {
 			const result = await createBattleSimulation(validCommand)
 
+			assert(result.status === 'success', 'Status is not success')
 			expect(result.losingTeam).toBeDefined()
 		})
 
@@ -65,6 +69,23 @@ describe('given a valid CreateBattleSimulation command', () => {
 			const result = await createBattleSimulation(validCommand)
 
 			expect(result.status).toBe('success')
+		})
+	})
+
+	describe('when simulation result in error', () => {
+		test('then simulation throws error message with more context', async () => {
+			const shouldThrow = async () =>
+				await createBattleSimulation({
+					...validCommand,
+					awayTeam: {
+						...validCommand.awayTeam,
+						trainerId: 2 as unknown as string,
+					},
+				})
+
+			await expect(shouldThrow).rejects.toThrow(
+				'Unexpected error calling runSimulation => Trainer name must be a non empty string'
+			)
 		})
 	})
 

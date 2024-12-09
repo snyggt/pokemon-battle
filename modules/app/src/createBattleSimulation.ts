@@ -1,18 +1,27 @@
-import assert from 'assert'
 import { rethrow } from './errorHandling/rethrow'
-import { battle, Team } from '@snyggt/pokemon-battle-domain/src/battle'
+import { battle, Team, assert } from '@snyggt/pokemon-battle-domain/src/battle'
 
 export interface CreateBattleSimulationCommand {
 	homeTeam: TeamDto
 	awayTeam: TeamDto
 }
 
-export interface CreateBattleSimulationResult {
+type CreateBattleSimulationResult =
+	| CreateBattleSimulationSuccess
+	| CreateBattleSimulationError
+
+export interface CreateBattleSimulationSuccess {
 	status: 'success'
 	message: string
 	battleLog: BattleLogRecord[]
 	winningTeam: TeamDto
 	losingTeam: TeamDto
+}
+
+export interface CreateBattleSimulationError {
+	status: 'error'
+	message: string
+	validationErrors: string[]
 }
 
 export const createBattleSimulationHandler = (services: Services) =>
@@ -94,13 +103,13 @@ const resolveTeams = async ({
 	const homeTeam = resolveTeam({
 		command,
 		pokemons,
-		trainerName: 'HomeTeamTrainer',
+		trainerName: command.homeTeam.trainerId,
 	})
 
 	const awayTeam = resolveTeam({
 		command,
 		pokemons,
-		trainerName: 'AwayTeamTrainer',
+		trainerName: command.awayTeam.trainerId,
 	})
 
 	return { awayTeam, homeTeam }
@@ -162,5 +171,5 @@ interface Pokemon {
 	avg_spawns: number
 	spawn_time: string
 	multipliers?: number[]
-	weaknesses?: number[]
+	weaknesses?: string[]
 }

@@ -23,13 +23,13 @@ describe('given a new battle', () => {
 	test('then game should not be ended', async () => {
 		const testBattle = battle()
 
-		expect(testBattle.ended).toBe(false)
+		expect(testBattle.currentAttackingTrainer).toBe(undefined)
 	})
 
-	test('then no errors should exist', async () => {
+	test('then battle should not have started', async () => {
 		const testBattle = battle()
 
-		expect(testBattle.hasError).toBe(false)
+		expect(testBattle.started).toBe(false)
 	})
 })
 
@@ -82,7 +82,7 @@ describe('given a new battle - battle has started - when checking currentAttacki
 	})
 })
 
-describe('given a new battle - battle has started - and home team trainer commands an attack', () => {
+describe('given a new battle - and battle has started - and home team trainer commands an attack', () => {
 	test('then the currentAttackingTrainer should be away team trainer and turn should be 2', async () => {
 		const testBattle = battle()
 
@@ -123,25 +123,17 @@ describe('when adding a valid homeTeam', () => {
 		const testBattle = battle()
 
 		testBattle.addHomeTeam(team())
-
-		expect(testBattle.hasError).toBe(false)
 	})
 })
 
 describe('given a new battle -  when adding a valid home team if home team already exists', () => {
-	test('then a forbidden error should exist', async () => {
+	test('then a error should have been thrown', async () => {
 		const testBattle = battle()
 
 		testBattle.addHomeTeam(team())
-		testBattle.addHomeTeam(team())
+		const shouldThrow = () => testBattle.addHomeTeam(team())
 
-		expect(testBattle.errors).toEqual([
-			{
-				message: 'homeTeam: team already exists',
-				type: 'forbidden',
-			},
-		])
-		expect(testBattle.hasError).toBe(true)
+		expect(shouldThrow).toThrow(new Error('Home team cannot be added twise'))
 	})
 })
 
@@ -150,15 +142,9 @@ describe('given a new battle - when adding a valid away team if away team alread
 		const testBattle = battle()
 
 		testBattle.addAwayTeam(team())
-		testBattle.addAwayTeam(team())
+		const shouldThrow = () => testBattle.addAwayTeam(team())
 
-		expect(testBattle.errors).toEqual([
-			{
-				message: 'awayTeam: team already exists',
-				type: 'forbidden',
-			},
-		])
-		expect(testBattle.hasError).toBe(true)
+		expect(shouldThrow).toThrow(new Error('Away team cannot be added twise'))
 	})
 })
 
@@ -167,15 +153,11 @@ describe('given a new battle - when adding home team and away team with same tra
 		const testBattle = battle()
 
 		testBattle.addAwayTeam(team())
-		testBattle.addHomeTeam(team())
+		const shouldThrow = () => testBattle.addHomeTeam(team())
 
-		expect(testBattle.errors).toEqual([
-			{
-				message: 'homeTeam: trainer name is already in use in away team',
-				type: 'forbidden',
-			},
-		])
-		expect(testBattle.hasError).toBe(true)
+		expect(shouldThrow).toThrow(
+			new Error('Team trainers must have different trainer names')
+		)
 	})
 })
 
@@ -184,15 +166,11 @@ describe('given a new battle - when adding away team and home team with same tra
 		const testBattle = battle()
 
 		testBattle.addHomeTeam(team())
-		testBattle.addAwayTeam(team())
+		const shouldThrow = () => testBattle.addAwayTeam(team())
 
-		expect(testBattle.errors).toEqual([
-			{
-				message: 'awayTeam: trainer name is already in use in home team',
-				type: 'forbidden',
-			},
-		])
-		expect(testBattle.hasError).toBe(true)
+		expect(shouldThrow).toThrow(
+			new Error('Team trainers must have different trainer names')
+		)
 	})
 })
 
@@ -200,16 +178,11 @@ describe('given a new battle - when trying to start the battle before both teams
 	test('then a forbidden error should exist', async () => {
 		const testBattle = battle()
 
-		testBattle.begin()
+		const shouldThrow = () => testBattle.begin()
 
-		expect(testBattle.errors).toEqual([
-			{
-				message: 'begin: battle must have two teams to begin',
-				type: 'forbidden',
-			},
-		])
-
-		expect(testBattle.hasError).toBe(true)
+		expect(shouldThrow).toThrow(
+			new Error('Battle must have two teams to begin')
+		)
 		expect(testBattle.started).toBe(false)
 	})
 })
@@ -235,20 +208,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 		async ({ invalid, expectedError }) => {
 			const testBattle = battle()
 
-			testBattle.addHomeTeam(invalid)
-			testBattle.addAwayTeam(invalid)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalid)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalid)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 
@@ -269,20 +234,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 			const testBattle = battle()
 			const invalidTeam = { ...team(), trainer: invalid }
 
-			testBattle.addHomeTeam(invalidTeam)
-			testBattle.addAwayTeam(invalidTeam)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalidTeam)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalidTeam)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 
@@ -306,20 +263,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 			const testBattle = battle()
 			const invalidTeam = { ...team(), pokemons: invalid }
 
-			testBattle.addHomeTeam(invalidTeam)
-			testBattle.addAwayTeam(invalidTeam)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalidTeam)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalidTeam)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 
@@ -341,20 +290,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 				],
 			}
 
-			testBattle.addHomeTeam(invalidTeam)
-			testBattle.addAwayTeam(invalidTeam)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalidTeam)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalidTeam)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 
@@ -378,20 +319,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 				],
 			}
 
-			testBattle.addHomeTeam(invalidTeam)
-			testBattle.addAwayTeam(invalidTeam)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalidTeam)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalidTeam)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 
@@ -413,20 +346,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 					{ ...validPokemon(), weaknesses: invalid },
 				],
 			}
-			testBattle.addHomeTeam(invalidTeam)
-			testBattle.addAwayTeam(invalidTeam)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalidTeam)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalidTeam)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 
@@ -449,20 +374,12 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 				],
 			}
 
-			testBattle.addHomeTeam(invalidTeam)
-			testBattle.addAwayTeam(invalidTeam)
+			const shouldThrowHomeTeam = () => testBattle.addHomeTeam(invalidTeam)
+			const shouldThrowAwayTeam = () => testBattle.addAwayTeam(invalidTeam)
 
-			expect(testBattle.hasError).toBe(true)
-			expect(testBattle.errors).toEqual([
-				{
-					message: 'homeTeam: ' + expectedError,
-					type: 'validation',
-				},
-				{
-					message: 'awayTeam: ' + expectedError,
-					type: 'validation',
-				},
-			])
+			expect(shouldThrowHomeTeam).toThrow(new Error(expectedError))
+			expect(shouldThrowAwayTeam).toThrow(new Error(expectedError))
+			expect(testBattle.started).toBe(false)
 		}
 	)
 })
