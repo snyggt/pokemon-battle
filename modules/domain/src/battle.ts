@@ -10,28 +10,23 @@ export const battle = () => {
 			if (!isValidTeam(team, { onError: pushError })) {
 				return
 			}
-			const homeTeam = {
-				trainer: {
-					name: team.trainer.name,
-				},
-				pokemons: team.pokemons.map(pokemon => {
-					const validatedPokedexId = pokidexIdMustBeNumberFrom1to151({
-						pokedexId: pokemon.pokedexId,
-						onError: pushError,
-					})
-					return {
-						pokedexId: validatedPokedexId,
-						name: pokemon.name,
-						types: pokemon.types,
-						weaknesses: pokemon.weaknesses,
-						multipliers: pokemon.multipliers,
-						health: startHealth,
-					}
-				}),
-			}
 
 			if (!hasError()) {
-				battleState.homeTeam = homeTeam
+				battleState.homeTeam = {
+					trainer: {
+						name: team.trainer.name,
+					},
+					pokemons: team.pokemons.map(pokemon => {
+						return {
+							pokedexId: pokemon.pokedexId,
+							name: pokemon.name,
+							types: pokemon.types,
+							weaknesses: pokemon.weaknesses,
+							multipliers: pokemon.multipliers,
+							health: startHealth,
+						}
+					}),
+				}
 			}
 		},
 		get gameCompleted() {
@@ -83,14 +78,6 @@ const isValidTeam = (
 		return false
 	}
 
-	if (!Array.isArray(team.pokemons)) {
-		onError?.({
-			type: 'validation',
-			message: 'Team pokemons must be an array',
-		})
-		return false
-	}
-
 	if (team.pokemons.length !== 3) {
 		onError?.({
 			type: 'validation',
@@ -99,30 +86,29 @@ const isValidTeam = (
 		return false
 	}
 
+	if (team.pokemons.some(pokemon => !isPartial(pokemon))) {
+		onError?.({
+			type: 'validation',
+			message: 'Each team pokemon must be a object',
+		})
+		return false
+	}
+
+	if (team.pokemons.some(pokemon => !isNumberFrom1to151(pokemon.pokedexId))) {
+		onError?.({
+			type: 'validation',
+			message: 'Each team pokemon pokedexId must be a number from 1 to 151',
+		})
+		return false
+	}
 	return true
 }
+
 const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>
 	typeof val === 'string' && val.trim().length > 0
 
-const pokidexIdMustBeNumberFrom1to151 = <T>({
-	pokedexId,
-	onError,
-}: {
-	pokedexId: T
-	onError: (e: BattleError) => void
-}) => {
-	const isNumberFrom1to151String =
-		typeof pokedexId === 'number' && pokedexId <= 151 && pokedexId >= 1
-
-	if (!isNumberFrom1to151String) {
-		onError({
-			type: 'validation',
-			message: 'PokidexId must be a number from 1 to 151',
-		})
-	}
-
-	return pokedexId
-}
+const isNumberFrom1to151 = <T>(val: unknown | T): val is number =>
+	typeof val === 'number' && val <= 151 && val >= 1
 
 export interface BattleError {
 	type: 'validation'
