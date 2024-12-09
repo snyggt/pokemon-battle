@@ -14,12 +14,51 @@ export const validPokemon: (overrides?: Partial<Pokemon>) => Pokemon = ({
 	weaknesses,
 })
 
-export const team: () => Team = () => ({
-	trainer: { name: 'testTrainer' },
+export const team: (name?: string) => Team = (name = 'testTrainer') => ({
+	trainer: { name },
 	pokemons: [validPokemon(), validPokemon(), validPokemon()],
 })
 
 describe('given a new battle', () => {
+	describe('and battle is started', () => {
+		describe('when checking what trainer turn it is', () => {
+			test('then count should be 1', async () => {
+				const testBattle = battle()
+
+				testBattle.addAwayTeam(team('awayTrainer'))
+				testBattle.addHomeTeam(team('homeTrainer'))
+				testBattle.begin()
+				const currentTurn = testBattle.currentTurn
+
+				expect(currentTurn?.count).toBe(1)
+			})
+
+			test('then trainer name should be home team trainer', async () => {
+				const testBattle = battle()
+
+				testBattle.addAwayTeam(team('awayTrainer'))
+				testBattle.addHomeTeam(team('homeTrainer'))
+				testBattle.begin()
+				const currentTurnTrainerName = testBattle.currentTurn?.trainer.name
+
+				expect(currentTurnTrainerName).toBe('homeTrainer')
+			})
+		})
+	})
+
+	describe('and both teams are added', () => {
+		describe('when trying to start the battle', () => {
+			test('then battle should be started', async () => {
+				const testBattle = battle()
+
+				testBattle.addAwayTeam(team('awayTrainer'))
+				testBattle.addHomeTeam(team('homeTrainer'))
+				testBattle.begin()
+
+				expect(testBattle.started).toBe(true)
+			})
+		})
+	})
 	test('then game should not be ended', async () => {
 		const testBattle = battle()
 
@@ -122,7 +161,9 @@ describe('given a new battle', () => {
 					type: 'forbidden',
 				},
 			])
+
 			expect(testBattle.hasError).toBe(true)
+			expect(testBattle.started).toBe(false)
 		})
 	})
 

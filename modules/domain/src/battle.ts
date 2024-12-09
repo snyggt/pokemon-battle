@@ -1,7 +1,10 @@
 const startHealth = 1000
 
 export const battle = () => {
-	const battleState: BattleState = { ended: false }
+	const battleState: BattleState = {
+		ended: false,
+		started: false,
+	}
 	const errors: BattleError[] = []
 	const hasError = () => errors.length > 0
 	const pushError = (prefix: string) => (e: BattleError) =>
@@ -61,16 +64,25 @@ export const battle = () => {
 			battleState.awayTeam = toBattleActiveTeam(team)
 		},
 		begin() {
-			if (!battleState.homeTeam || !battleState.awayTeam) {
+			if (!battleState.homeTeam?.trainer || !battleState.awayTeam?.trainer) {
 				pushError('begin')({
 					message: 'battle must have two teams to begin',
 					type: 'forbidden',
 				})
 				return
 			}
+
+			battleState.started = true
+			battleState.turn = { count: 1, trainer: battleState.homeTeam.trainer }
+		},
+		get started() {
+			return battleState.started
 		},
 		get ended() {
 			return battleState.ended
+		},
+		get currentTurn() {
+			return battleState.turn
 		},
 		get hasError() {
 			return hasError()
@@ -305,4 +317,6 @@ interface BattleState {
 	homeTeam?: { trainer?: Trainer; pokemons?: BattleActivePokemon[] }
 	awayTeam?: { trainer?: Trainer; pokemons?: BattleActivePokemon[] }
 	ended: boolean
+	turn?: { count: number; trainer: Trainer }
+	started: boolean
 }
