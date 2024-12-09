@@ -110,6 +110,22 @@ describe('given a new battle', () => {
 		})
 	})
 
+	describe('when trying to start the battle before both teams exist', () => {
+		test('then a forbidden error should exist', async () => {
+			const testBattle = battle()
+
+			testBattle.begin()
+
+			expect(testBattle.errors).toEqual([
+				{
+					message: 'begin: battle must have two teams to begin',
+					type: 'forbidden',
+				},
+			])
+			expect(testBattle.hasError).toBe(true)
+		})
+	})
+
 	const createArray = (num: number) => new Array(num).fill('')
 
 	describe('when adding a invalid home and away team', () => {

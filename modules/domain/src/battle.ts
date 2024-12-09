@@ -60,6 +60,15 @@ export const battle = () => {
 
 			battleState.awayTeam = toBattleActiveTeam(team)
 		},
+		begin() {
+			if (!battleState.homeTeam || !battleState.awayTeam) {
+				pushError('begin')({
+					message: 'battle must have two teams to begin',
+					type: 'forbidden',
+				})
+				return
+			}
+		},
 		get ended() {
 			return battleState.ended
 		},
