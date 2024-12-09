@@ -1,88 +1,165 @@
-const startHealth = 1000
-
 export const battle = () => {
 	const battleState: BattleState = {
 		ended: false,
 		started: false,
 	}
 	const errors: BattleError[] = []
+
 	const hasError = () => errors.length > 0
+
 	const pushError = (prefix: string) => (e: BattleError) =>
 		errors.push({ ...e, message: [prefix, e.message].join(': ') })
 
+	const ended = () =>
+		[
+			hasPokemonLeft(battleState.awayTeam),
+			hasPokemonLeft(battleState.homeTeam),
+		].some(Boolean)
+
+	const calculateDamage = () => 100
+
 	return {
 		addHomeTeam(team: Team) {
-			if (!isValidTeam(team, { onError: pushError('homeTeam') })) {
-				return
+			const onError = pushError('homeTeam')
+			if (!isValidTeam(team, { onError })) {
+				return false
 			}
 
-			if (
-				battleState.awayTeam?.trainer &&
-				team.trainer.name === battleState.awayTeam.trainer.name
-			) {
-				pushError('addHomeTeam')({
-					message: 'trainer name is already in use in home team',
+			if (teamHaveSameTrainerName(battleState.awayTeam, team.trainer.name)) {
+				onError({
+					message: 'trainer name is already in use in away team',
 					type: 'forbidden',
 				})
-				return
+				return false
 			}
 
 			if (battleState.homeTeam) {
-				pushError('addHomeTeam')({
+				onError({
 					message: 'team already exists',
 					type: 'forbidden',
 				})
-				return
+				return false
 			}
 
 			battleState.homeTeam = toBattleActiveTeam(team)
 		},
+
 		addAwayTeam(team: Team) {
-			if (!isValidTeam(team, { onError: pushError('awayTeam') })) {
-				return
+			const onError = pushError('awayTeam')
+
+			if (!isValidTeam(team, { onError })) {
+				return false
 			}
 
-			if (battleState.awayTeam) {
-				pushError('addAwayTeam')({
-					message: 'team already exists',
-					type: 'forbidden',
-				})
-				return
-			}
-
-			if (
-				battleState.homeTeam?.trainer &&
-				team.trainer.name === battleState.homeTeam.trainer.name
-			) {
-				pushError('addAwayTeam')({
+			if (teamHaveSameTrainerName(battleState.homeTeam, team.trainer.name)) {
+				onError({
 					message: 'trainer name is already in use in home team',
 					type: 'forbidden',
 				})
-				return
+				return false
+			}
+
+			if (battleState.awayTeam) {
+				onError({
+					message: 'team already exists',
+					type: 'forbidden',
+				})
+				return false
 			}
 
 			battleState.awayTeam = toBattleActiveTeam(team)
 		},
+
 		begin() {
+			const onError = pushError('begin')
+
 			if (!battleState.homeTeam?.trainer || !battleState.awayTeam?.trainer) {
-				pushError('begin')({
+				onError({
 					message: 'battle must have two teams to begin',
 					type: 'forbidden',
 				})
-				return
+				return false
 			}
 
 			battleState.started = true
-			battleState.turn = { count: 1, trainer: battleState.homeTeam.trainer }
+			battleState.turn = { count: 1, attacker: battleState.homeTeam.trainer }
+		},
+
+		selectTeam(trainerName: string) {
+			const attackingTeam = [battleState.awayTeam, battleState.homeTeam].find(
+				team => team?.trainer?.name === trainerName
+			)
+			const oponentTeam = [battleState.awayTeam, battleState.homeTeam].find(
+				team => team?.trainer?.name !== trainerName
+			)
+
+			assert(attackingTeam, 'No attacking team found')
+			assert(oponentTeam, 'No oponentTeam team found')
+			return {
+				attack: () => {
+					const canAttack = [
+						trainerName !== battleState.turn?.attacker.name,
+						!ended(),
+						attackingTeam,
+						oponentTeam,
+					].some(Boolean)
+
+					if (!canAttack) {
+						return false
+					}
+
+					const oponentPokemon = oponentTeam.pokemons.find(
+						pokemon => pokemon.health > 0
+					)
+
+					const teamPokemon = attackingTeam.pokemons.find(
+						pokemon => pokemon.health > 0
+					)
+
+					assert(battleState.turn, 'no turn found')
+					assert(oponentPokemon, 'All oponent pokemons has fainted')
+					assert(teamPokemon, 'All oponent pokemons has fainted')
+
+					oponentPokemon.health -= calculateDamage()
+					battleState.turn.count += 1
+					battleState.turn.attacker = oponentTeam.trainer
+				},
+				get anyPokemonLeft() {
+					const teamPokemon = attackingTeam.pokemons.find(
+						pokemon => pokemon.health > 0
+					)
+					return !!teamPokemon
+				},
+				get teamPokemonHealth() {
+					const teamPokemon = attackingTeam.pokemons.find(
+						pokemon => pokemon.health > 0
+					)
+					return teamPokemon?.health ?? 0
+				},
+				get oponentPokemonHealth() {
+					const oponentPokemon = oponentTeam.pokemons.find(
+						pokemon => pokemon.health > 0
+					)
+					return oponentPokemon?.health ?? 0
+				},
+			}
 		},
 		get started() {
 			return battleState.started
 		},
 		get ended() {
-			return battleState.ended
+			return ended()
 		},
 		get currentTurn() {
-			return battleState.turn
+			assert(battleState.turn, 'Turn not available until battle is started')
+			return battleState.turn?.count ?? 0
+		},
+		get currentAttackingTrainer() {
+			assert(
+				battleState.turn,
+				'Attacking trainer not available until battle is started'
+			)
+			return battleState.turn.attacker.name
 		},
 		get hasError() {
 			return hasError()
@@ -90,6 +167,12 @@ export const battle = () => {
 		get errors() {
 			return [...errors.map(e => ({ ...e }))]
 		},
+	}
+}
+
+function assert(condition: unknown, message: string): asserts condition {
+	if (!condition) {
+		throw new Error(message)
 	}
 }
 
@@ -108,6 +191,8 @@ const toBattleActiveTeam = (team: Team) => ({
 		}
 	}),
 })
+
+const startHealth = 1000
 
 const isPartial = <T extends object>(val: unknown | T): val is Partial<T> =>
 	typeof val === 'object' && val !== null && !(val instanceof Error)
@@ -283,6 +368,14 @@ const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>
 const isNumberFrom1to151 = <T>(val: unknown | T): val is number =>
 	typeof val === 'number' && val <= 151 && val >= 1
 
+const hasPokemonLeft = (team: BattleTeam | undefined) =>
+	team?.pokemons.some(p => p.health > 0)
+
+const teamHaveSameTrainerName = (
+	battleTeam: BattleTeam | undefined,
+	trainerName: string
+) => battleTeam?.trainer && trainerName === battleTeam.trainer.name
+
 export interface BattleError {
 	type: 'validation' | 'forbidden'
 	message: string
@@ -313,10 +406,12 @@ interface BattleActivePokemon {
 	health: number
 }
 
+type BattleTeam = { trainer: Trainer; pokemons: BattleActivePokemon[] }
+
 interface BattleState {
-	homeTeam?: { trainer?: Trainer; pokemons?: BattleActivePokemon[] }
-	awayTeam?: { trainer?: Trainer; pokemons?: BattleActivePokemon[] }
+	homeTeam?: BattleTeam
+	awayTeam?: BattleTeam
 	ended: boolean
-	turn?: { count: number; trainer: Trainer }
+	turn?: { count: number; attacker: Trainer }
 	started: boolean
 }

@@ -42,7 +42,7 @@ describe('given a new battle - and battle is started - when checking what traine
 		testBattle.begin()
 		const currentTurn = testBattle.currentTurn
 
-		expect(currentTurn?.count).toBe(1)
+		expect(currentTurn).toBe(1)
 	})
 
 	test('then trainer name should be home team trainer', async () => {
@@ -51,7 +51,7 @@ describe('given a new battle - and battle is started - when checking what traine
 		testBattle.addAwayTeam(team('awayTrainer'))
 		testBattle.addHomeTeam(team('homeTrainer'))
 		testBattle.begin()
-		const currentTurnTrainerName = testBattle.currentTurn?.trainer.name
+		const currentTurnTrainerName = testBattle.currentAttackingTrainer
 
 		expect(currentTurnTrainerName).toBe('homeTrainer')
 	})
@@ -66,6 +66,55 @@ describe('given a new battle - and both teams are added - when trying to start t
 		testBattle.begin()
 
 		expect(testBattle.started).toBe(true)
+	})
+})
+
+describe('given a new battle - battle has started - when checking currentAttackingTrainer', () => {
+	test('then the homeTeam trainer name should be returned', async () => {
+		const testBattle = battle()
+
+		const homeTeam = team('homeTrainer')
+		testBattle.addAwayTeam(team('awayTrainer'))
+		testBattle.addHomeTeam(homeTeam)
+		testBattle.begin()
+
+		expect(testBattle.currentAttackingTrainer).toBe(homeTeam.trainer.name)
+	})
+})
+
+describe('given a new battle - battle has started - and home team trainer commands an attack', () => {
+	test('then the currentAttackingTrainer should be away team trainer and turn should be 2', async () => {
+		const testBattle = battle()
+
+		const homeTeam = team('homeTrainer')
+		const awayTeam = team('awayTrainer')
+
+		testBattle.addAwayTeam(awayTeam)
+		testBattle.addHomeTeam(homeTeam)
+		testBattle.begin()
+		testBattle.selectTeam(homeTeam.trainer.name).attack()
+
+		expect(testBattle.currentAttackingTrainer).toBe(awayTeam.trainer.name)
+		expect(testBattle.currentTurn).toBe(2)
+	})
+
+	test('then the oponent teams active pokemon health should be lower than before the attack', async () => {
+		const homeTeam = team('homeTrainer')
+		const awayTeam = team('awayTrainer')
+
+		const testBattle = battle()
+		testBattle.addAwayTeam(awayTeam)
+		testBattle.addHomeTeam(homeTeam)
+		testBattle.begin()
+		const teamActions = testBattle.selectTeam(homeTeam.trainer.name)
+		const oponentPokemonHealthBefore = teamActions.oponentPokemonHealth
+		teamActions.attack()
+
+		expect(testBattle.currentAttackingTrainer).toBe(awayTeam.trainer.name)
+		expect(testBattle.currentTurn).toBe(2)
+		expect(teamActions.oponentPokemonHealth).toBeLessThan(
+			oponentPokemonHealthBefore
+		)
 	})
 })
 
@@ -88,7 +137,7 @@ describe('given a new battle -  when adding a valid home team if home team alrea
 
 		expect(testBattle.errors).toEqual([
 			{
-				message: 'addHomeTeam: team already exists',
+				message: 'homeTeam: team already exists',
 				type: 'forbidden',
 			},
 		])
@@ -105,7 +154,7 @@ describe('given a new battle - when adding a valid away team if away team alread
 
 		expect(testBattle.errors).toEqual([
 			{
-				message: 'addAwayTeam: team already exists',
+				message: 'awayTeam: team already exists',
 				type: 'forbidden',
 			},
 		])
@@ -122,7 +171,7 @@ describe('given a new battle - when adding home team and away team with same tra
 
 		expect(testBattle.errors).toEqual([
 			{
-				message: 'addHomeTeam: trainer name is already in use in home team',
+				message: 'homeTeam: trainer name is already in use in away team',
 				type: 'forbidden',
 			},
 		])
@@ -139,7 +188,7 @@ describe('given a new battle - when adding away team and home team with same tra
 
 		expect(testBattle.errors).toEqual([
 			{
-				message: 'addAwayTeam: trainer name is already in use in home team',
+				message: 'awayTeam: trainer name is already in use in home team',
 				type: 'forbidden',
 			},
 		])
