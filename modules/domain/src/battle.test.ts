@@ -76,6 +76,40 @@ describe('given a new battle', () => {
 		})
 	})
 
+	describe('when adding home team and away team with same trainer name exists', () => {
+		test('then a forbidden error should exist', async () => {
+			const testBattle = battle()
+
+			testBattle.addAwayTeam(team())
+			testBattle.addHomeTeam(team())
+
+			expect(testBattle.errors).toEqual([
+				{
+					message: 'addHomeTeam: trainer name is already in use in home team',
+					type: 'forbidden',
+				},
+			])
+			expect(testBattle.hasError).toBe(true)
+		})
+	})
+
+	describe('when adding away team and home team with same trainer name exists', () => {
+		test('then a forbidden error should exist', async () => {
+			const testBattle = battle()
+
+			testBattle.addHomeTeam(team())
+			testBattle.addAwayTeam(team())
+
+			expect(testBattle.errors).toEqual([
+				{
+					message: 'addAwayTeam: trainer name is already in use in home team',
+					type: 'forbidden',
+				},
+			])
+			expect(testBattle.hasError).toBe(true)
+		})
+	})
+
 	const createArray = (num: number) => new Array(num).fill('')
 
 	describe('when adding a invalid home and away team', () => {

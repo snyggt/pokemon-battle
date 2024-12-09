@@ -13,6 +13,17 @@ export const battle = () => {
 				return
 			}
 
+			if (
+				battleState.awayTeam?.trainer &&
+				team.trainer.name === battleState.awayTeam.trainer.name
+			) {
+				pushError('addHomeTeam')({
+					message: 'trainer name is already in use in home team',
+					type: 'forbidden',
+				})
+				return
+			}
+
 			if (!!battleState.homeTeam) {
 				pushError('addHomeTeam')({
 					message: 'team already exists',
@@ -31,6 +42,17 @@ export const battle = () => {
 			if (!!battleState.awayTeam) {
 				pushError('addAwayTeam')({
 					message: 'team already exists',
+					type: 'forbidden',
+				})
+				return
+			}
+
+			if (
+				battleState.homeTeam?.trainer &&
+				team.trainer.name === battleState.homeTeam.trainer.name
+			) {
+				pushError('addAwayTeam')({
+					message: 'trainer name is already in use in home team',
 					type: 'forbidden',
 				})
 				return
