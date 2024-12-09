@@ -35,7 +35,7 @@ Simple backlog to keep track of the project progress
 
 1. [ ] Battle Simulation
    - [x] add CreateBattleSimulation command handler and implement simulation
-   - [ ] create new battle with teams and a trainer
+   - [x] create new battle with teams and a trainer
    - [ ] enforce battle rules required to run simulation until one team looses
    - [ ] enforce multiplier combat rules
    - [ ] enforce weekness combat rules
