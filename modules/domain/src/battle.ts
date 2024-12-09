@@ -123,6 +123,31 @@ const isValidTeam = (
 		return false
 	}
 
+	if (
+		team.pokemons.some(
+			pokemon =>
+				!(Array.isArray(pokemon.weaknesses) || pokemon.weaknesses === undefined)
+		)
+	) {
+		onError?.({
+			type: 'validation',
+			message: 'Optional Pokemon field weaknesses must be an array if defined',
+		})
+		return false
+	}
+
+	if (
+		team.pokemons.some(
+			pokemon => !!pokemon.weaknesses && !pokemon.weaknesses.every(isValidType)
+		)
+	) {
+		onError?.({
+			type: 'validation',
+			message: `Pokemon weaknesses if defined must only include any of the following types: ${validTypes.join(', ')}`,
+		})
+		return false
+	}
+
 	return true
 }
 
@@ -165,7 +190,7 @@ export interface Pokemon {
 	name: string
 	pokedexId: number
 	multipliers: number[]
-	weaknesses: string[]
+	weaknesses?: string[]
 	types: string[]
 }
 
