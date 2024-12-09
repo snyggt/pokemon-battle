@@ -79,7 +79,11 @@ export const battle = () => {
 					assert(oponentPokemon, 'All oponent pokemons has fainted')
 					assert(teamPokemon, 'All oponent pokemons has fainted')
 
-					oponentPokemon.health -= calculateDamage()
+					const calculatedDamage = calculateDamage(oponentPokemon, teamPokemon)
+					oponentPokemon.health -= Math.min(
+						oponentPokemon.health,
+						calculatedDamage
+					)
 					battleState.turn.count += 1
 					battleState.turn.attacker = oponentTeam.trainer
 				},
@@ -278,7 +282,24 @@ const isNumberFrom1to151 = <T>(val: unknown | T): val is number =>
 const hasPokemonLeft = (team: BattleTeam | undefined) =>
 	team?.pokemons.some(p => p.health > 0)
 
-const calculateDamage = () => 100
+const calculateDamage = (
+	oponent: BattleActivePokemon,
+	attacker: BattleActivePokemon
+) => {
+	const BASE_DAMAGE = 100
+	const BASE_MULTIPLIER_DAMAGE = 20
+	const damageAfterMultipliers = attacker.multipliers.reduce(
+		(totalDamage, multiplier) => {
+			return totalDamage + multiplier * BASE_MULTIPLIER_DAMAGE
+		},
+		BASE_DAMAGE
+	)
+	const numberOfWeaknesses = new Set(
+		oponent.weaknesses.filter(weaknes => attacker.types.includes(weaknes))
+	).size
+
+	return Math.round(damageAfterMultipliers * (1 + 1.1 * numberOfWeaknesses))
+}
 
 export interface BattleError {
 	type: 'validation' | 'forbidden'

@@ -65,17 +65,69 @@ describe('given a new battle - when battle is started - and 10 rounds is played'
 		testBattle.addHomeTeam(team('homeTrainer'))
 		testBattle.begin()
 
-		new Array(29).fill('').forEach(() => {
+		new Array(26).fill('').forEach(() => {
 			testBattle.selectTeam('homeTrainer').attack()
 			testBattle.selectTeam('awayTrainer').attack()
 		})
 		testBattle.selectTeam('homeTrainer').attack()
 
-		expect(testBattle.battleScores.homeTeam.activePokemon?.health).toBe(100)
-		expect(testBattle.battleScores.homeTeam.activePokemon?.health).toBe(100)
+		expect(testBattle.battleScores.homeTeam.activePokemon?.health).toBe(24)
 		expect(testBattle.battleScores.ended).toBe(true)
 	})
 })
+
+describe('given a new battle - when battle is started - combat rules should be applied', () => {
+	test.each`
+		multipliers           | weaknesses                             | attackerTypes                          | expectedDamage
+		${[]}                 | ${[]}                                  | ${['Fire']}                            | ${100}
+		${[1.5, 1.5]}         | ${[]}                                  | ${['Fire']}                            | ${160}
+		${[0.01, 0.01, 0.01]} | ${[]}                                  | ${['Fire']}                            | ${101}
+		${[1.5, 1.5]}         | ${['Water']}                           | ${['Fire']}                            | ${160}
+		${[1.5, 1.5]}         | ${['Fire']}                            | ${['Fire']}                            | ${336}
+		${[1.5, 1.5]}         | ${['Fire', 'Fire']}                    | ${['Fire', 'Fire']}                    | ${336}
+		${[1.5, 1.5]}         | ${['Fire', 'Water']}                   | ${['Fire']}                            | ${336}
+		${[1.5, 1.5]}         | ${['Fire', 'Water']}                   | ${['Fire', 'Water']}                   | ${512}
+		${[]}                 | ${['Fire', 'Water', 'Grass', 'Ghost']} | ${['Fire', 'Water', 'Grass', 'Ghost']} | ${540}
+		${[5, 5, 5, 5, 5]}    | ${[]}                                  | ${['Fire']}                            | ${600}
+		${[1.5, 1.5]}         | ${['Fire', 'Water', 'Grass']}          | ${['Fire', 'Water', 'Grass']}          | ${688}
+		${[1.5, 1.5]}         | ${['Fire', 'Water', 'Grass', 'Ghost']} | ${['Fire', 'Water', 'Grass', 'Ghost']} | ${864}
+		${[5]}                | ${['Fire', 'Water', 'Grass', 'Ghost']} | ${['Fire', 'Water', 'Grass', 'Ghost']} | ${1000}
+	`(
+		'then oponent with weaknesses "$weaknesses" attackerTypes "$attackerTypes" and attacker multipliers "$multipliers" deals "$expectedDamage"',
+		async ({ multipliers, weaknesses, attackerTypes, expectedDamage }) => {
+			const testBattle = battle()
+			const homeTeam = {
+				trainer: { name: 'homeTeam' },
+				pokemons: [
+					{ ...validPokemon(), multipliers: multipliers, types: attackerTypes },
+					validPokemon(),
+					validPokemon(),
+				],
+			}
+			const awayTeam = {
+				trainer: { name: 'awayTeam' },
+				pokemons: [
+					{ ...validPokemon(), weaknesses, types: attackerTypes },
+					validPokemon(),
+					validPokemon(),
+				],
+			}
+
+			testBattle.addAwayTeam(awayTeam)
+			testBattle.addHomeTeam(homeTeam)
+			testBattle.begin()
+
+			const beforeAttack =
+				testBattle.battleScores.awayTeam.activePokemon?.health ?? 0
+			testBattle.selectTeam('homeTeam').attack()
+			const afterAttack =
+				testBattle.battleScores.awayTeam.pokemons?.[0]?.health ?? 0
+
+			expect(beforeAttack - afterAttack).toBe(expectedDamage)
+		}
+	)
+})
+
 describe('given a new battle - and both teams are added - when trying to start the battle', () => {
 	test('then battle should be started', async () => {
 		const testBattle = battle()
