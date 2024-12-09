@@ -3,15 +3,40 @@ export const battle = () => {
 	const battleState: BattleState = { gameCompleted: false }
 	const errors: BattleError[] = []
 	const hasError = () => errors.length > 0
-	const pushError = (e: BattleError) => errors.push(e)
 
 	return {
 		addHomeTeam(team: Team) {
+			const pushError = (e: BattleError) =>
+				errors.push({ ...e, message: 'homeTeam: ' + e.message })
 			if (!isValidTeam(team, { onError: pushError })) {
 				return
 			}
 
 			battleState.homeTeam = {
+				trainer: {
+					name: team.trainer.name,
+				},
+				pokemons: team.pokemons.map(pokemon => {
+					return {
+						pokedexId: pokemon.pokedexId,
+						name: pokemon.name,
+						types: pokemon.types,
+						weaknesses: pokemon.weaknesses,
+						multipliers: pokemon.multipliers,
+						health: startHealth,
+					}
+				}),
+			}
+		},
+
+		addAwayTeam(team: Team) {
+			const pushError = (e: BattleError) =>
+				errors.push({ ...e, message: 'awayTeam: ' + e.message })
+			if (!isValidTeam(team, { onError: pushError })) {
+				return
+			}
+
+			battleState.awayTeam = {
 				trainer: {
 					name: team.trainer.name,
 				},
