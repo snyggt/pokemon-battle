@@ -13,6 +13,13 @@ export const battle = () => {
 				return
 			}
 
+			if (!!battleState.homeTeam) {
+				pushError('homeTeam')({
+					message: 'Home team already exists',
+					type: 'forbidden',
+				})
+			}
+
 			battleState.homeTeam = toBattleActiveTeam(team)
 		},
 		addAwayTeam(team: Team) {
@@ -225,7 +232,7 @@ const isNumberFrom1to151 = <T>(val: unknown | T): val is number =>
 	typeof val === 'number' && val <= 151 && val >= 1
 
 export interface BattleError {
-	type: 'validation'
+	type: 'validation' | 'forbidden'
 	message: string
 }
 export interface Team {
