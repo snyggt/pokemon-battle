@@ -16,13 +16,13 @@ describe('given a valid CreateBattleSimulation command', () => {
 	}
 
 	describe('when simulation runns to success', () => {
-		test('then result should include a battleLog', async () => {
+		test('then simulation result includes a battleLog', async () => {
 			const result = await createBattleSimulation(validCommand)
 
 			expect(result.battleLog).toBeDefined()
 		})
 
-		test('then a winning team should include a winning team', async () => {
+		test('then simulation result includes a winning team', async () => {
 			const result = await createBattleSimulation(validCommand)
 
 			expect(result.winningTeam).toBeDefined()
