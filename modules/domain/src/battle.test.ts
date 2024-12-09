@@ -33,7 +33,7 @@ describe('given a new battle', () => {
 	})
 })
 
-describe('given a new battle - and battle is started - when checking what trainer turn it is', () => {
+describe('given a new battle - when battle is started', () => {
 	test('then count should be 1', async () => {
 		const testBattle = battle()
 
@@ -57,6 +57,25 @@ describe('given a new battle - and battle is started - when checking what traine
 	})
 })
 
+describe('given a new battle - when battle is started - and 10 rounds is played', () => {
+	test('then one scores should be available', async () => {
+		const testBattle = battle()
+
+		testBattle.addAwayTeam(team('awayTrainer'))
+		testBattle.addHomeTeam(team('homeTrainer'))
+		testBattle.begin()
+
+		new Array(29).fill('').forEach(() => {
+			testBattle.selectTeam('homeTrainer').attack()
+			testBattle.selectTeam('awayTrainer').attack()
+		})
+		testBattle.selectTeam('homeTrainer').attack()
+
+		expect(testBattle.battleScores.homeTeam.activePokemon?.health).toBe(100)
+		expect(testBattle.battleScores.homeTeam.activePokemon?.health).toBe(100)
+		expect(testBattle.battleScores.ended).toBe(true)
+	})
+})
 describe('given a new battle - and both teams are added - when trying to start the battle', () => {
 	test('then battle should be started', async () => {
 		const testBattle = battle()

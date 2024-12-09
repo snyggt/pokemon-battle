@@ -18,12 +18,10 @@ export const battle = () => {
 	return {
 		addHomeTeam(team: Team) {
 			assertValidTeam(team)
-
 			assertTeamsHaveDifferentTrainerNames(
 				battleState.awayTeam,
 				team.trainer.name
 			)
-
 			assert(!battleState.homeTeam, 'Home team cannot be added twise')
 
 			battleState.homeTeam = toBattleActiveTeam(team)
@@ -31,12 +29,10 @@ export const battle = () => {
 
 		addAwayTeam(team: Team) {
 			assertValidTeam(team)
-
 			assertTeamsHaveDifferentTrainerNames(
 				battleState.homeTeam,
 				team.trainer.name
 			)
-
 			assert(!battleState.awayTeam, 'Away team cannot be added twise')
 
 			battleState.awayTeam = toBattleActiveTeam(team)
@@ -112,6 +108,17 @@ export const battle = () => {
 		},
 		get ended() {
 			return ended()
+		},
+		get battleScores() {
+			assert(
+				battleState.started,
+				'Game must start before checking battle scores'
+			)
+			return {
+				ended: ended(),
+				homeTeam: getTeamSnapshot(battleState.homeTeam),
+				awayTeam: getTeamSnapshot(battleState.awayTeam),
+			}
 		},
 		get currentTurn() {
 			assert(battleState.turn, 'Turn not available until battle is started')
@@ -231,6 +238,15 @@ function assertValidTeam(team: unknown): asserts team is Team {
 		'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000'
 	)
 }
+
+const getTeamSnapshot = (team: BattleTeam | undefined) =>
+	Object.freeze({
+		...team,
+		pokemons: team?.pokemons.map(pokemon => Object.freeze({ ...pokemon })),
+		activePokemon: Object.freeze({
+			...team?.pokemons.find(p => p.health > 0),
+		}),
+	})
 
 const validPokemonTypes = [
 	'Grass',
