@@ -262,19 +262,13 @@ export interface PokemonService {
 	getByIds: (id: number[]) => Promise<Pokemon[]>
 }
 
-interface Pokemon {
+export interface Pokemon {
 	pokedexId: number
-	num: string
+	types: string[]
 	name: string
 	img: string
-	types: string[]
 	height: string
 	weight: string
-	candy: string
-	egg: string
-	spawn_chance: number
-	avg_spawns: number
-	spawn_time: string
-	multipliers?: number[]
-	weaknesses?: string[]
+	multipliers: number[]
+	weaknesses: string[]
 }
