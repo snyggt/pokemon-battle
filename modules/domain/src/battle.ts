@@ -333,10 +333,10 @@ function assertValidTeam(team: unknown): asserts team is Team {
 				!pokemon.multipliers ||
 				pokemon.multipliers.every(
 					multiplier =>
-						typeof multiplier === 'number' && multiplier > 0 && multiplier <= 5
+						typeof multiplier === 'number' && multiplier > 0 && multiplier <= 12
 				)
 		),
-		'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000'
+		'If Pokemon multipliers is defined it must only include numbers between 0.001 and 12.000'
 	)
 }
 
@@ -353,6 +353,7 @@ const validPokemonTypes = [
 	'Grass',
 	'Poison',
 	'Fire',
+	'Fairy',
 	'Flying',
 	'Water',
 	'Bug',
@@ -365,6 +366,8 @@ const validPokemonTypes = [
 	'Ice',
 	'Ghost',
 	'Dragon',
+	'Dark',
+	'Steel',
 ]
 
 const isValidType = <T>(val: unknown | T): val is string =>
