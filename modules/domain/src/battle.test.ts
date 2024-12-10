@@ -139,7 +139,12 @@ describe('given a new battle - when battle is started - and battle is played to 
 		expect(testBattle.events).toEqual([
 			expect.objectContaining({ type: 'team-joined' }),
 			expect.objectContaining({ type: 'team-joined' }),
-			expect.objectContaining({ type: 'started' }),
+			expect.objectContaining({
+				type: 'started',
+				payload: expect.objectContaining({
+					battleState: expect.objectContaining({ id: expect.any(String) }),
+				}),
+			}),
 			...Array(53)
 				.fill('')
 				.map(() => expect.objectContaining({ type: 'attacked' })),

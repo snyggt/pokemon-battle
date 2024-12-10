@@ -3,6 +3,7 @@ import { panic } from './errorHandling'
 
 export const battle = () => {
 	const battleState: BattleState = {
+		id: randomUUID(),
 		started: false,
 		turn: undefined,
 	}
@@ -475,6 +476,7 @@ interface BattleActivePokemon {
 type TeamType = 'homeTeam' | 'awayTeam'
 
 interface BattleState {
+	id: string
 	turn?: { count: number; attackingTeaam: TeamType }
 	started: boolean
 }
