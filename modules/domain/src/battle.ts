@@ -198,11 +198,16 @@ export const battle = () => {
 					})
 
 					if (ended()) {
+						const homeTeam = pokemonsByTeam.get('homeTeam')
+						const awayTeam = pokemonsByTeam.get('awayTeam')
+						assert(homeTeam, 'No homeTeam found')
+						assert(awayTeam, 'No awayTeam found')
 						addEvent<EndedEvent>({
 							type: 'ended',
 							payload: {
 								battleState,
-								pokemons: [...pokemonsById.values()],
+								homeTeam,
+								awayTeam,
 							},
 						})
 					}
@@ -403,7 +408,11 @@ export type BattleEvent =
 
 export interface EndedEvent extends EventBase {
 	type: 'ended'
-	payload: { battleState: BattleState; pokemons: BattleActivePokemon[] }
+	payload: {
+		battleState: BattleState
+		homeTeam: BattleActivePokemon[]
+		awayTeam: BattleActivePokemon[]
+	}
 }
 
 export interface AttackedEvent extends EventBase {
