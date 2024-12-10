@@ -388,6 +388,12 @@ const calculateDamage = (
 	return Math.round(damageAfterMultipliers * (1 + 1.1 * numberOfWeaknesses))
 }
 
+export const isBattleEvent = <T extends BattleEvent['type']>(
+	e: EventEnvelope<BattleEvent>,
+	type: T
+): e is EventEnvelope<Extract<BattleEvent, { type: T }>> => {
+	return e.type === type
+}
 interface EventBase {
 	type: string
 	payload: Record<string, unknown>

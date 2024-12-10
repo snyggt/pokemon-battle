@@ -93,6 +93,7 @@ describe('given a new battle - when battle is started - and one attack is made',
 				attackedPokemon: expect.objectContaining({ health: 878 }),
 			}),
 		})
+
 		expect(testBattle.events).toEqual([
 			expect.objectContaining({ type: 'team-joined' }),
 			expect.objectContaining({ type: 'team-joined' }),
