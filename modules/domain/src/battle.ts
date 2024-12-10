@@ -102,7 +102,17 @@ export const battle = () => {
 
 			addEvent<StartedEvent>({
 				type: 'started',
-				payload: { battleState, awayTeam, homeTeam },
+				payload: {
+					battleState: {
+						...battleState,
+						turn: {
+							count: 1,
+							attackingTeaam: 'homeTeam',
+						},
+					},
+					awayTeam: [...awayTeam],
+					homeTeam: [...homeTeam],
+				},
 			})
 		},
 

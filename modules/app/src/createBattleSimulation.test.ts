@@ -45,20 +45,6 @@ describe('given a valid CreateBattleSimulation command', () => {
 			expect(result.battleLog).toBeDefined()
 		})
 
-		test('then simulation result includes a winning team', async () => {
-			const result = await createBattleSimulation(validCommand)
-
-			assert(result.status === 'success', 'Status is not success')
-			expect(result.winningTeam).toBeDefined()
-		})
-
-		test('then simulation result includes a losing team', async () => {
-			const result = await createBattleSimulation(validCommand)
-
-			assert(result.status === 'success', 'Status is not success')
-			expect(result.losingTeam).toBeDefined()
-		})
-
 		test('then simulation result includes a status', async () => {
 			const result = await createBattleSimulation(validCommand)
 
@@ -68,7 +54,423 @@ describe('given a valid CreateBattleSimulation command', () => {
 		test('then simulation status is success', async () => {
 			const result = await createBattleSimulation(validCommand)
 
-			expect(result.status).toBe('success')
+			expect(result).toEqual({
+				battleLog: expect.arrayContaining([
+					{
+						details: [
+							'Pokémon info:',
+							'Bulbasaur (#1); types: Grass, Poison; weaknesses: Fire, Ice, Flying, Psychic',
+							'Bulbasaur (#1); types: Grass, Poison; weaknesses: Fire, Ice, Flying, Psychic',
+							'Bulbasaur (#1); types: Grass, Poison; weaknesses: Fire, Ice, Flying, Psychic',
+						],
+						title:
+							'Trainer homeTrainer with pokémons Bulbasaur, Bulbasaur, Bulbasaur joined homeTeam',
+						turn: 0,
+					},
+					{
+						details: [
+							'Pokémon info:',
+							'Bulbasaur (#1); types: Grass, Poison; weaknesses: Fire, Ice, Flying, Psychic',
+							'Bulbasaur (#1); types: Grass, Poison; weaknesses: Fire, Ice, Flying, Psychic',
+							'Bulbasaur (#1); types: Grass, Poison; weaknesses: Fire, Ice, Flying, Psychic',
+						],
+						title:
+							'Trainer awayTrainer with pokémons Bulbasaur, Bulbasaur, Bulbasaur joined awayTeam',
+						turn: 0,
+					},
+					{
+						details: [
+							"Turn 1 begins with trainer 'homeTrainer' with choosen pokémon 'Bulbasaur' VS. trainer 'awayTrainer' with choosen pokémon 'Bulbasaur'",
+						],
+						title: expect.any(String),
+						turn: 1,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 868 health left'",
+						turn: 2,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 868 health left'",
+						turn: 3,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 736 health left'",
+						turn: 4,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 736 health left'",
+						turn: 5,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 604 health left'",
+						turn: 6,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 604 health left'",
+						turn: 7,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 472 health left'",
+						turn: 8,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 472 health left'",
+						turn: 9,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 340 health left'",
+						turn: 10,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 340 health left'",
+						turn: 11,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 208 health left'",
+						turn: 12,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 208 health left'",
+						turn: 13,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 76 health left'",
+						turn: 14,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 76 health left'",
+						turn: 15,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 76 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 0 health left'",
+						turn: 16,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 76 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 0 health left'",
+						turn: 17,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 868 health left'",
+						turn: 18,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 868 health left'",
+						turn: 19,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 736 health left'",
+						turn: 20,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 736 health left'",
+						turn: 21,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 604 health left'",
+						turn: 22,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 604 health left'",
+						turn: 23,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 472 health left'",
+						turn: 24,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 472 health left'",
+						turn: 25,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 340 health left'",
+						turn: 26,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 340 health left'",
+						turn: 27,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 208 health left'",
+						turn: 28,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 208 health left'",
+						turn: 29,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 76 health left'",
+						turn: 30,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 76 health left'",
+						turn: 31,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 76 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 0 health left'",
+						turn: 32,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 76 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 0 health left'",
+						turn: 33,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 868 health left'",
+						turn: 34,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 868 health left'",
+						turn: 35,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 736 health left'",
+						turn: 36,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 736 health left'",
+						turn: 37,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 604 health left'",
+						turn: 38,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 604 health left'",
+						turn: 39,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 472 health left'",
+						turn: 40,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 472 health left'",
+						turn: 41,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 340 health left'",
+						turn: 42,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 340 health left'",
+						turn: 43,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 208 health left'",
+						turn: 44,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 208 health left'",
+						turn: 45,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 76 health left'",
+						turn: 46,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'awayTrainer' with pokémon 'Bulbasaur' deals 132 damage to trainer 'homeTrainers' pokémon 'Bulbasaur' resulting in 76 health left'",
+						turn: 47,
+					},
+					{
+						details: [
+							"Defending Pokémon 'Bulbasaur' has no weaknesses against Pokémon 'Bulbasaur'",
+						],
+						title:
+							"Trainer 'homeTrainer' with pokémon 'Bulbasaur' deals 76 damage to trainer 'awayTrainers' pokémon 'Bulbasaur' resulting in 0 health left'",
+						turn: 48,
+					},
+					{
+						details: ['The battle lasted 48 turns'],
+						title: expect.stringContaining(
+							"ended with winner homeTrainer! Pokémons 'Bulbasaur' still standing strong!"
+						),
+						turn: 48,
+					},
+				]),
+				status: 'success',
+			})
 		})
 	})
 

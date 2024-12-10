@@ -40,7 +40,7 @@ Simple backlog to keep track of the project progress
    - [x] enforce multiplier combat rules
    - [x] enforce weekness combat rules
    - [x] generate Battle events
-   - [ ] map battle events to BattleLog
+   - [x] map battle events to BattleLog
    - [ ] add PokemonService port to fetch pokemon data to be used to initiate battle
    - [ ] implement InMemoryPokemonService adapter that to serve a inmemory pokemon dataset
    - [ ] implement /api/v1/post/battle {simulate:true}

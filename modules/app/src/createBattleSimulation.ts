@@ -1,5 +1,13 @@
+import { EOL } from 'os'
 import { rethrow } from './errorHandling/rethrow'
-import { battle, Team, assert } from '@snyggt/pokemon-battle-domain/src/battle'
+import {
+	battle,
+	Team,
+	assert,
+	BattleEvent,
+	EventEnvelope,
+	isBattleEvent,
+} from '@snyggt/pokemon-battle-domain/src/battle'
 
 export interface CreateBattleSimulationCommand {
 	homeTeam: TeamDto
@@ -12,10 +20,7 @@ type CreateBattleSimulationResult =
 
 export interface CreateBattleSimulationSuccess {
 	status: 'success'
-	message: string
 	battleLog: BattleLogRecord[]
-	winningTeam: TeamDto
-	losingTeam: TeamDto
 }
 
 export interface CreateBattleSimulationError {
@@ -37,17 +42,110 @@ export const createBattleSimulationHandler = (services: Services) =>
 		await runSimulation({
 			battleSimulation: pokemonBattle,
 			teams,
-			maxNumberOfTurns: 20,
+			maxNumberOfTurns: 200,
 		}).catch(rethrow('Unexpected error calling runSimulation'))
 
 		return {
-			battleLog: [{ event: 'battle started' }],
-			winningTeam: command.awayTeam,
-			losingTeam: command.homeTeam,
-			message: 'ran to success',
+			battleLog: generateBattleLog(pokemonBattle.events),
 			status: 'success',
 		}
 	}
+
+const isBattleLog = (
+	possibleRecord: Partial<BattleLogRecord> | undefined
+): possibleRecord is BattleLogRecord =>
+	Boolean(possibleRecord?.details && possibleRecord.title)
+
+const generateBattleLog = (events: EventEnvelope<BattleEvent>[]) =>
+	events
+		.map(e => {
+			if (isBattleEvent(e, 'team-joined')) {
+				const {
+					teamType,
+					trainer: { name },
+					pokemons,
+				} = e.payload
+
+				return {
+					title: `Trainer ${name} with pokémons ${pokemons.map(p => p.name).join(', ')} joined ${teamType}`,
+					details: [
+						'Pokémon info:',
+						...pokemons.map(
+							pokemon =>
+								`${pokemon.name} (#${pokemon.pokedexId}); types: ${pokemon.types.join(', ')}; weaknesses: ${pokemon.weaknesses.join(', ')}`
+						),
+					],
+					turn: 0,
+				}
+			}
+			if (isBattleEvent(e, 'started')) {
+				const { homeTeam, awayTeam, battleState } = e.payload
+				const [homePokemon1] = homeTeam
+				const [awayPokemon1] = awayTeam
+
+				return {
+					title: `Battle with id ${e.payload.battleState.id} started with pokémons:${homeTeam.map(p => p.name).join(', ')}`,
+					details: [
+						`Turn 1 begins with trainer '${homePokemon1.trainerName}' with choosen pokémon '${homePokemon1.name}' VS. trainer '${awayPokemon1.trainerName}' with choosen pokémon '${awayPokemon1.name}'`,
+					],
+					turn: battleState.turn?.count,
+				}
+			}
+
+			if (isBattleEvent(e, 'attacked')) {
+				const { attackedPokemon, attackedByPokemon, damage, turn } = e.payload
+				const {
+					health,
+					name: defendingPokemon,
+					weaknesses,
+					trainerName: defendingTrainer,
+				} = attackedPokemon
+				const { name: attacker, types, trainerName } = attackedByPokemon
+
+				const matchingWeaknesses = weaknesses.filter(weakness =>
+					types.includes(weakness)
+				)
+				const weaknessesInformation = matchingWeaknesses.length
+					? `is weak against`
+					: 'has no weaknesses against'
+
+				return {
+					title: `Trainer '${trainerName}' with pokémon '${attacker}' deals ${damage} damage to trainer '${defendingTrainer}s' pokémon '${defendingPokemon}' resulting in ${health} health left'`,
+					details: [
+						`Defending Pokémon '${defendingPokemon}' ${weaknessesInformation} Pokémon '${attacker}'`,
+					],
+					turn: turn,
+				}
+			}
+
+			if (isBattleEvent(e, 'ended')) {
+				const { homeTeam, awayTeam, battleState } = e.payload
+				const [homePokemon1] = homeTeam
+				const [awayPokemon1] = awayTeam
+				const homeTeamNumberOfPokemonsLeft = homeTeam.filter(
+					pokemon => pokemon.health > 0
+				)
+				const awayTeamNumberOfPokemonsLeft = awayTeam.filter(
+					pokemon => pokemon.health > 0
+				)
+
+				const winningTrainer = homeTeamNumberOfPokemonsLeft.length
+					? homePokemon1.trainerName
+					: awayPokemon1.trainerName
+				const pokemonsLeft = homeTeamNumberOfPokemonsLeft.length
+					? homeTeamNumberOfPokemonsLeft
+					: awayTeamNumberOfPokemonsLeft
+
+				return {
+					title: `Battle with id ${e.payload.battleState.id} ended with winner ${winningTrainer}! Pokémons '${pokemonsLeft.map(p => p.name).join(', ')}' still standing strong!`,
+					details: [`The battle lasted ${battleState.turn?.count} turns`],
+					turn: battleState.turn?.count ?? -1,
+				}
+			}
+
+			return undefined
+		})
+		.filter(isBattleLog)
 
 const extractUniquePokemonIds = ({
 	awayTeam,
@@ -130,13 +228,18 @@ const runSimulation = async ({
 	battleSimulation.addAwayTeam(awayTeam)
 	battleSimulation.begin()
 
+	const homeTeamActions = battleSimulation.selectTeam(homeTeam.trainer.name)
+	const awayTeamActions = battleSimulation.selectTeam(awayTeam.trainer.name)
+
 	let turn = 0
 	while (!battleSimulation.ended && turn < maxNumberOfTurns) {
 		turn += 1
-		const homeTeamActions = battleSimulation.selectTeam(homeTeam.trainer.name)
-		const awayTeamActions = battleSimulation.selectTeam(awayTeam.trainer.name)
-		homeTeamActions.attack()
-		awayTeamActions.attack()
+		if (!battleSimulation.ended) {
+			homeTeamActions.attack()
+		}
+		if (!battleSimulation.ended) {
+			awayTeamActions.attack()
+		}
 	}
 }
 interface TeamDto {
@@ -145,7 +248,9 @@ interface TeamDto {
 }
 
 interface BattleLogRecord {
-	event: string
+	title: string
+	details: string[]
+	turn: number
 }
 
 // TODO: extract
@@ -153,7 +258,7 @@ export interface Services {
 	pokemonService: PokemonService
 }
 
-interface PokemonService {
+export interface PokemonService {
 	getByIds: (id: number[]) => Promise<Pokemon[]>
 }
 
