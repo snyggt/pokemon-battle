@@ -1,12 +1,9 @@
+import { EventEnvelope } from '@snyggt/pokemon-battle-domain/src/events/EventEnvelope'
 import { rethrow } from './errorHandling/rethrow'
-import {
-	battle,
-	Team,
-	assert,
-	BattleEvent,
-	EventEnvelope,
-	isBattleEvent,
-} from '@snyggt/pokemon-battle-domain/src/battle'
+import { battle, isBattleEvent } from '@snyggt/pokemon-battle-domain/src/battle'
+import { BattleEvent } from '@snyggt/pokemon-battle-domain/src/events/BattleEvent'
+import { assert } from '@snyggt/pokemon-battle-domain/src/assert'
+import { TeamDto } from '@snyggt/pokemon-battle-domain/src/models/Team'
 
 type CreateBattleSimulationResult =
 	| CreateBattleSimulationSuccess
@@ -158,7 +155,7 @@ const resolveTeam = ({
 	trainerName,
 }: {
 	trainerName: string
-	team: TeamDto
+	team: AppTeamDto
 	pokemons: Pokemon[]
 }) => {
 	return {
@@ -193,13 +190,13 @@ const resolveTeams = async ({
 	const homeTeam = resolveTeam({
 		team: command.homeTeam,
 		pokemons,
-		trainerName: command.homeTeam.trainerId,
+		trainerName: command.homeTeam.trainerName,
 	})
 
 	const awayTeam = resolveTeam({
 		team: command.awayTeam,
 		pokemons,
-		trainerName: command.awayTeam.trainerId,
+		trainerName: command.awayTeam.trainerName,
 	})
 
 	return { awayTeam, homeTeam }
@@ -208,7 +205,7 @@ const resolveTeams = async ({
 interface RunSimulationCommand {
 	battleSimulation: ReturnType<typeof battle>
 	maxNumberOfTurns?: number
-	teams: { homeTeam: Team; awayTeam: Team }
+	teams: { homeTeam: TeamDto; awayTeam: TeamDto }
 }
 
 const runSimulation = async ({
@@ -235,12 +232,13 @@ const runSimulation = async ({
 	}
 }
 export interface CreateBattleSimulationCommand {
-	homeTeam: TeamDto
-	awayTeam: TeamDto
+	awayTeam: AppTeamDto
+	homeTeam: AppTeamDto
+	simulate?: true
 }
 
-export interface TeamDto {
-	trainerId: string
+export interface AppTeamDto {
+	trainerName: string
 	pokemons: number[]
 }
 

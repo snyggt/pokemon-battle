@@ -7,6 +7,7 @@ export default defineConfig({
 	treeshake: true,
 	bundle: true,
 	platform: 'node',
+    outDir: 'dist',
 	loader: {
 		'.node': 'file',
 	},

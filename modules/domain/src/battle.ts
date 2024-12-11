@@ -1,12 +1,26 @@
 import { randomUUID } from 'crypto'
-import { panic } from './errorHandling'
 
-interface Lookups {
-	pokemonsById: Map<string, BattleActivePokemon>
-	teamByTrainerName: Map<string, TeamType>
-	pokemonsByTeam: Map<TeamType, BattleActivePokemon[]>
-	trainerNameByTeam: Map<TeamType, string>
-}
+import { assert } from './assert'
+import { assertValidTeam } from './assert/assertValidTeam'
+import { assertTeamsHaveDifferentTrainerNames } from './assert/assertTeamHaveDifferentTrainerNames'
+
+import { TeamType } from './models/TeamType'
+import { TeamDto } from './models/Team'
+import { BattleTeam } from './models/BattleTeam'
+import { BattleActivePokemon } from './models/BattleActivePokemon'
+import { BattleState } from './models/BattleState'
+import { BattleActiveTeam } from './models/BattleActiveTeam'
+
+import { TeamJoinedEvent } from './events/TeamJoinedEvent'
+import { createEventEnveloper } from './events/createEventEnveloper'
+import { EventEnvelope } from './events/EventEnvelope'
+import { BattleEvent } from './events/BattleEvent'
+import { StartedEvent } from './events/StartedEvent'
+import { AttackedEvent } from './events/AttackedEvent'
+import { EndedEvent } from './events/EndedEvent'
+
+import { START_HEALTH } from './constants'
+
 export const battle = () => {
 	const battleState: BattleState = {
 		id: randomUUID(),
@@ -26,7 +40,7 @@ export const battle = () => {
 	const addWithEnvelope = createEventEnveloper(events)
 
 	return {
-		addHomeTeam(team: Team) {
+		addHomeTeam(team: TeamDto) {
 			assertValidTeam(team)
 			const awayTrainer = trainerNameByTeam.get('awayTeam')
 			assertTeamsHaveDifferentTrainerNames(awayTrainer, team.trainer.name)
@@ -35,21 +49,21 @@ export const battle = () => {
 				'Home team cannot be added twise'
 			)
 
-			const battleTeam = toBattleActiveTeam(team, 'homeTeam')
+			const battleActiveTeam = toBattleActiveTeam(team, 'homeTeam')
 
-			addToLookups(battleTeam, 'homeTeam', lookups)
+			addToLookups(battleActiveTeam, 'homeTeam', lookups)
 
 			addWithEnvelope<TeamJoinedEvent>({
 				type: 'team-joined',
 				payload: {
 					teamType: 'homeTeam',
-					pokemons: battleTeam.pokemons,
-					trainer: battleTeam.trainer,
+					pokemons: battleActiveTeam.pokemons,
+					trainer: battleActiveTeam.trainer,
 				},
 			})
 		},
 
-		addAwayTeam(team: Team) {
+		addAwayTeam(team: TeamDto) {
 			assertValidTeam(team)
 			const homeTrainer = trainerNameByTeam.get('homeTeam')
 			const awayTrainer = trainerNameByTeam.get('awayTeam')
@@ -146,12 +160,6 @@ export const battle = () => {
 	}
 }
 
-export function assert(condition: unknown, message: string): asserts condition {
-	if (!condition) {
-		panic(message, { removeCallerFromStack: true })
-	}
-}
-
 const createAttackFunction =
 	(
 		team: TeamType,
@@ -215,7 +223,11 @@ const createAttackFunction =
 			})
 		}
 	}
-const toBattleActiveTeam = (team: Team, teamType: 'homeTeam' | 'awayTeam') => ({
+
+const toBattleActiveTeam = (
+	team: TeamDto,
+	teamType: 'homeTeam' | 'awayTeam'
+) => ({
 	trainer: {
 		name: team.trainer.name,
 	},
@@ -229,127 +241,10 @@ const toBattleActiveTeam = (team: Team, teamType: 'homeTeam' | 'awayTeam') => ({
 			types: pokemon.types,
 			weaknesses: pokemon.weaknesses || [],
 			multipliers: pokemon.multipliers || [],
-			health: startHealth,
+			health: START_HEALTH,
 		}
 	}),
 })
-
-const startHealth = 1000
-
-const isPartial = <T extends object>(val: unknown | T): val is Partial<T> =>
-	typeof val === 'object' && val !== null && !(val instanceof Error)
-
-function assertTeamsHaveDifferentTrainerNames(
-	firstTrainerName: string | undefined,
-	sedcondTrainerName: string
-) {
-	assert(
-		!firstTrainerName || sedcondTrainerName !== firstTrainerName,
-		'Team trainers must have different trainer names'
-	)
-}
-
-function assertValidTeam(team: unknown): asserts team is Team {
-	assert(isPartial<Team>(team), 'Team must be a object')
-	assert(isPartial(team.trainer), 'Trainer must be a object')
-
-	assert(
-		isNonEmptyTrimmedString(team.trainer.name),
-		'Trainer name must be a non empty string'
-	)
-	assert(Array.isArray(team.pokemons), 'Team pokemons must be an array')
-
-	assert(team.pokemons.length === 3, 'Each team must have three pokemons')
-
-	assert(
-		team.pokemons.every(pokemon => isPartial(pokemon)),
-		'Each team pokemon must be a object'
-	)
-
-	assert(
-		team.pokemons.every(pokemon => isNumberFrom1to151(pokemon.pokedexId)),
-		'Each team pokemon pokedexId must be a number from 1 to 151'
-	)
-
-	assert(
-		team.pokemons.every(pokemon => Array.isArray(pokemon.types)),
-		'Pokemon types field must be an array'
-	)
-
-	assert(
-		team.pokemons.every(pokemon => pokemon.types.length > 0),
-		'Pokemon types field must have at least one type'
-	)
-
-	assert(
-		team.pokemons.every(pokemon => pokemon.types.every(isValidType)),
-		`Pokemon types field must only include the following types: ${validPokemonTypes.join(', ')}`
-	)
-	assert(
-		team.pokemons.every(
-			pokemon =>
-				Array.isArray(pokemon.weaknesses) || pokemon.weaknesses === undefined
-		),
-		'Optional Pokemon field weaknesses must be an array if defined'
-	)
-
-	assert(
-		team.pokemons.every(
-			pokemon => !pokemon.weaknesses || pokemon.weaknesses.every(isValidType)
-		),
-		`Pokemon weaknesses if defined must only include any of the following types: ${validPokemonTypes.join(', ')}`
-	)
-
-	assert(
-		team.pokemons.every(
-			pokemon =>
-				Array.isArray(pokemon.multipliers) || pokemon.multipliers === undefined
-		),
-		'Optional Pokemon field multipliers field must be an array if defined'
-	)
-
-	assert(
-		team.pokemons.every(
-			pokemon =>
-				!pokemon.multipliers ||
-				pokemon.multipliers.every(
-					multiplier =>
-						typeof multiplier === 'number' && multiplier > 0 && multiplier <= 12
-				)
-		),
-		'If Pokemon multipliers is defined it must only include numbers between 0.001 and 12.000'
-	)
-}
-
-const validPokemonTypes = [
-	'Grass',
-	'Poison',
-	'Fire',
-	'Fairy',
-	'Flying',
-	'Water',
-	'Bug',
-	'Normal',
-	'Electric',
-	'Ground',
-	'Fighting',
-	'Psychic',
-	'Rock',
-	'Ice',
-	'Ghost',
-	'Dragon',
-	'Dark',
-	'Steel',
-]
-
-const isValidType = <T>(val: unknown | T): val is string =>
-	typeof val === 'string' && validPokemonTypes.includes(val)
-
-const isNonEmptyTrimmedString = <T>(val: unknown | T): val is string =>
-	typeof val === 'string' && val.trim().length > 0
-
-const isNumberFrom1to151 = <T>(val: unknown | T): val is number =>
-	typeof val === 'number' && val <= 151 && val >= 1
 
 const hasPokemonLeft = (pokemons: BattleActivePokemon[] | undefined) =>
 	pokemons?.some(p => p.health > 0)
@@ -390,20 +285,7 @@ const addToLookups = (
 	battleTeam.pokemons.forEach(pokemon => pokemonsById.set(pokemon.id, pokemon))
 }
 
-const createEventEnveloper =
-	(events: EventEnvelope<BattleEvent>[]) =>
-	<T extends BattleEvent>(e: T) => {
-		const eventEnvelope: EventEnvelope<T> = Object.freeze({
-			type: e.type,
-			payload: Object.freeze({ ...e.payload }),
-			id: randomUUID(),
-			revision: events.length + 1,
-			timestamp: new Date(),
-		})
-
-		events.push(eventEnvelope)
-	}
-const ended = (pokemonsByTeam: Map<TeamType, BattleActivePokemon[]>) =>
+const ended = (pokemonsByTeam: Map<TeamType, BattleActiveTeam>) =>
 	[
 		!hasPokemonLeft(pokemonsByTeam.get('awayTeam')),
 		!hasPokemonLeft(pokemonsByTeam.get('homeTeam')),
@@ -415,100 +297,10 @@ export const isBattleEvent = <T extends BattleEvent['type']>(
 ): e is EventEnvelope<Extract<BattleEvent, { type: T }>> => {
 	return e.type === type
 }
-interface EventBase {
-	type: string
-	payload: Record<string, unknown>
-}
 
-export interface EventEnvelope<T extends EventBase> {
-	id: string
-	timestamp: Date
-	revision: number
-	payload: T['payload']
-	type: T['type']
-}
-
-export type BattleEvent =
-	| AttackedEvent
-	| StartedEvent
-	| TeamJoinedEvent
-	| EndedEvent
-
-export interface EndedEvent extends EventBase {
-	type: 'ended'
-	payload: {
-		battleState: BattleState
-		homeTeam: BattleActivePokemon[]
-		awayTeam: BattleActivePokemon[]
-	}
-}
-
-export interface AttackedEvent extends EventBase {
-	type: 'attacked'
-	payload: {
-		attackedPokemon: BattleActivePokemon
-		attackedByPokemon: BattleActivePokemon
-		damage: number
-		turn: number
-	}
-}
-
-export interface TeamJoinedEvent extends EventBase {
-	type: 'team-joined'
-	payload: {
-		teamType: TeamType
-		pokemons: BattleActivePokemon[]
-		trainer: Trainer
-	}
-}
-
-export interface StartedEvent extends EventBase {
-	type: 'started'
-	payload: {
-		battleState: BattleState
-		homeTeam: BattleActivePokemon[]
-		awayTeam: BattleActivePokemon[]
-	}
-}
-
-export interface Team {
-	trainer: Trainer
-	pokemons: Pokemon[]
-}
-
-export interface Pokemon {
-	name: string
-	pokedexId: number
-	multipliers?: number[]
-	weaknesses?: string[]
-	types: string[]
-}
-
-interface Trainer {
-	name: string
-}
-
-interface BattleTeam {
-	trainer: Trainer
-	pokemons: BattleActivePokemon[]
-}
-
-interface BattleActivePokemon {
-	name: string
-	trainerName: string
-	teamType: TeamType
-	id: string
-	pokedexId: number
-	multipliers: number[]
-	weaknesses: string[]
-	types: string[]
-	health: number
-}
-
-type TeamType = 'homeTeam' | 'awayTeam'
-
-interface BattleState {
-	id: string
-	turn?: { count: number; attackingTeaam: TeamType }
-	started: boolean
+interface Lookups {
+	pokemonsById: Map<string, BattleActivePokemon>
+	teamByTrainerName: Map<string, TeamType>
+	pokemonsByTeam: Map<TeamType, BattleActiveTeam>
+	trainerNameByTeam: Map<TeamType, string>
 }

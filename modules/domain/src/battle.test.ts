@@ -1,30 +1,7 @@
-import {
-	battle,
-	Team,
-	Pokemon,
-	AttackedEvent,
-	assert,
-	isBattleEvent,
-} from './battle'
-
-const validPokemon: (overrides?: Partial<Pokemon>) => Pokemon = ({
-	pokedexId = 2,
-	name = 'Testimon',
-	multipliers = [1.1],
-	types = ['Fire'],
-	weaknesses = [],
-} = {}) => ({
-	name,
-	multipliers,
-	pokedexId,
-	types,
-	weaknesses,
-})
-
-const team: (name?: string) => Team = (name = 'testTrainer') => ({
-	trainer: { name },
-	pokemons: [validPokemon(), validPokemon(), validPokemon()],
-})
+import assert from 'assert'
+import { battle, isBattleEvent } from './battle'
+import { AttackedEvent } from './events/AttackedEvent'
+import { team, validPokemon } from './testHelpers'
 
 describe('given a new battle', () => {
 	test('then game should not be ended', async () => {

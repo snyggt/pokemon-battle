@@ -1,7 +1,9 @@
 {
+	"extends": "@snyggt/base/ts-base",
 	"compilerOptions": {
 		"esModuleInterop": true,
 		"downlevelIteration": true,
+		"outDir": "dist",
 		"paths": {
 			"@/*": ["${configDir}/src/*"]
 		}

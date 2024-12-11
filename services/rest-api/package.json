@@ -6,7 +6,7 @@
 	"scripts": {
 		"test": "jest",
 		"test:watch": "jest --watch",
-		"build": "tsup",
+		"build": "tsc && tsup",
 		"lint": "eslint",
 		"lint:fix": "eslint --fix",
 		"start": "node dist/server.js",

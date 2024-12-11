@@ -66,11 +66,11 @@ describe('given a inMemoryPokemonService', () => {
 						handler({
 							awayTeam: {
 								pokemons: [pokemon, pokemon, pokemon],
-								trainerId: 'Erik',
+								trainerName: 'Erik',
 							},
 							homeTeam: {
 								pokemons: [pokemon, pokemon, pokemon],
-								trainerId: 'Johan',
+								trainerName: 'Johan',
 							},
 						})
 							.then(_ => undefined)

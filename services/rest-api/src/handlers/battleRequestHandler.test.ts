@@ -62,22 +62,22 @@ describe('invalid payload', () => {
 
 	test.each`
 		invalid             | testDescription               | expectedError
-		${undefined}        | ${'undefined'}                | ${'At path: awayTeam.trainerId -- Expected a string, but received: undefined'}
-		${null}             | ${'null'}                     | ${'At path: awayTeam.trainerId -- Expected a string, but received: null'}
-		${0}                | ${'0'}                        | ${'At path: awayTeam.trainerId -- Expected a string, but received: 0'}
-		${[]}               | ${'empty array'}              | ${'At path: awayTeam.trainerId -- Expected a string, but received: '}
-		${[1]}              | ${'one items number array'}   | ${'At path: awayTeam.trainerId -- Expected a string, but received: 1'}
-		${[1, 2]}           | ${'two items number array'}   | ${'At path: awayTeam.trainerId -- Expected a string, but received: 1,2'}
-		${[1, 2, 3]}        | ${'three items number array'} | ${'At path: awayTeam.trainerId -- Expected a string, but received: 1,2,3'}
-		${Number.MAX_VALUE} | ${'big number'}               | ${'At path: awayTeam.trainerId -- Expected a string, but received: 1.7976931348623157e+308'}
-		${[]}               | ${'empty pokemons array'}     | ${'At path: awayTeam.trainerId -- Expected a string, but received: '}
+		${undefined}        | ${'undefined'}                | ${'At path: awayTeam.trainerName -- Expected a string, but received: undefined'}
+		${null}             | ${'null'}                     | ${'At path: awayTeam.trainerName -- Expected a string, but received: null'}
+		${0}                | ${'0'}                        | ${'At path: awayTeam.trainerName -- Expected a string, but received: 0'}
+		${[]}               | ${'empty array'}              | ${'At path: awayTeam.trainerName -- Expected a string, but received: '}
+		${[1]}              | ${'one items number array'}   | ${'At path: awayTeam.trainerName -- Expected a string, but received: 1'}
+		${[1, 2]}           | ${'two items number array'}   | ${'At path: awayTeam.trainerName -- Expected a string, but received: 1,2'}
+		${[1, 2, 3]}        | ${'three items number array'} | ${'At path: awayTeam.trainerName -- Expected a string, but received: 1,2,3'}
+		${Number.MAX_VALUE} | ${'big number'}               | ${'At path: awayTeam.trainerName -- Expected a string, but received: 1.7976931348623157e+308'}
+		${[]}               | ${'empty pokemons array'}     | ${'At path: awayTeam.trainerName -- Expected a string, but received: '}
 	`(
-		'[awayTeam.trainerId] "$testDescription" should result in a 400 (Bad Request)"',
+		'[awayTeam.trainerName] "$testDescription" should result in a 400 (Bad Request)"',
 		async ({ invalid, expectedError }) => {
 			mockedRes.json.mockReset()
 			const mockedReq = {
 				body: {
-					awayTeam: { ...validTeam('Erik'), trainerId: invalid },
+					awayTeam: { ...validTeam('Erik'), trainerName: invalid },
 					homeTeam: validTeam('Johan'),
 					simulate: true,
 				},
@@ -227,6 +227,6 @@ describe('invalid payload', () => {
 })
 
 const validTeam = (name = 'trainerName') => ({
-	trainerId: name,
+	trainerName: name,
 	pokemons: [1, 2, 3],
 })

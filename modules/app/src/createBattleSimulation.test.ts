@@ -1,4 +1,4 @@
-import { assert } from '@snyggt/pokemon-battle-domain/src/battle'
+import { assert } from '@snyggt/pokemon-battle-domain/src/assert'
 import {
 	createBattleSimulationHandler,
 	CreateBattleSimulationCommand,
@@ -453,7 +453,7 @@ describe('given a valid CreateBattleSimulation command', () => {
 					...validCommand,
 					awayTeam: {
 						...validCommand.awayTeam,
-						trainerId: 2 as unknown as string,
+						trainerName: 2 as unknown as string,
 					},
 				})
 
@@ -480,11 +480,11 @@ describe('given a valid CreateBattleSimulation command', () => {
 
 const validCommand: CreateBattleSimulationCommand = {
 	homeTeam: {
-		trainerId: 'homeTrainer',
+		trainerName: 'homeTrainer',
 		pokemons: [1, 1, 1],
 	},
 	awayTeam: {
-		trainerId: 'awayTrainer',
+		trainerName: 'awayTrainer',
 		pokemons: [1, 1, 1],
 	},
 }

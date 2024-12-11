@@ -5,8 +5,6 @@ import {
 	string,
 	type,
 	size,
-	boolean,
-	optional,
 	define,
 } from 'superstruct'
 import {
@@ -51,25 +49,24 @@ interface Options {
 	simulate?: true
 }
 const forceSimulation = () =>
-	define<true>('forceSimulation', (value: true) =>
+	define<true | undefined>('simulation', (value: unknown) =>
 		value === true
 			? true
 			: {
 					key: 'simulation',
 					message:
 						'Expected value true, creating battles without simulation is not supported yet',
-					code: 'force-simulation',
 				}
 	)
 
 const bodySchema: Describe<CreateBattleSimulationCommand & Options> = type({
 	simulate: forceSimulation(),
 	awayTeam: type({
-		trainerId: string(),
-		pokemons: pokemons,
+		trainerName: string(),
+		pokemons,
 	}),
 	homeTeam: type({
-		trainerId: string(),
-		pokemons: pokemons,
+		trainerName: string(),
+		pokemons,
 	}),
 })
