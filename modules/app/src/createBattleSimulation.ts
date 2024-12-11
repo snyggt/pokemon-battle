@@ -78,7 +78,7 @@ const generateBattleLog = (events: EventEnvelope<BattleEvent>[]) =>
 				const [awayPokemon1] = awayTeam
 
 				return {
-					title: `Battle with id ${e.payload.battleState.id} started with pokémons:${homeTeam.map(p => p.name).join(', ')}`,
+					title: `Battle with id ${e.payload.battleState.id} started`,
 					details: [
 						`Turn 1 begins with trainer '${homePokemon1.trainerName}' with choosen pokémon '${homePokemon1.name}' VS. trainer '${awayPokemon1.trainerName}' with choosen pokémon '${awayPokemon1.name}'`,
 					],
@@ -153,17 +153,17 @@ const extractUniquePokemonIds = ({
 }
 
 const resolveTeam = ({
-	command,
+	team,
 	pokemons,
 	trainerName,
 }: {
 	trainerName: string
-	command: CreateBattleSimulationCommand
+	team: TeamDto
 	pokemons: Pokemon[]
 }) => {
 	return {
 		trainer: { name: trainerName },
-		pokemons: command.homeTeam.pokemons.map(pokemonId => {
+		pokemons: team.pokemons.map(pokemonId => {
 			const pokemon = pokemons.find(pokmeon => pokmeon.pokedexId === pokemonId)
 
 			assert(pokemon, 'Pokemon not found in map')
@@ -191,13 +191,13 @@ const resolveTeams = async ({
 		.catch(rethrow('Unexpected error calling pokemonService.getByIds'))
 
 	const homeTeam = resolveTeam({
-		command,
+		team: command.homeTeam,
 		pokemons,
 		trainerName: command.homeTeam.trainerId,
 	})
 
 	const awayTeam = resolveTeam({
-		command,
+		team: command.awayTeam,
 		pokemons,
 		trainerName: command.awayTeam.trainerId,
 	})
