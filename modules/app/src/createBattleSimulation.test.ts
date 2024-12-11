@@ -489,7 +489,7 @@ const validCommand: CreateBattleSimulationCommand = {
 	},
 }
 
-const pokemonService = { getByIds: jest.fn() }
+const pokemonService = { getByIds: jest.fn(), getAll: jest.fn() }
 
 const createBattleSimulation = createBattleSimulationHandler({
 	pokemonService,

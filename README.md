@@ -73,7 +73,7 @@ Try out the endpoint by sending a http request
 `POST: /api/v1/battle`
 
 Curl example:
-Replace awayTeam.pokemons and homeTeam.pokemons numbers with anything between 1 - 151 to simulate diffrent battles.
+**Create Battle Simulation**: Replace awayTeam.pokemons and homeTeam.pokemons numbers with anything between 1 - 151 to simulate diffrent battles.
 
 ```bash
 curl --location 'localhost:3000/api/v1/battle' \
@@ -100,6 +100,16 @@ curl --location 'localhost:3000/api/v1/battle' \
 }'
 ```
 
+**Get all pokemons**
+
+Get all 151 pokemons, use the pokedexId as id for creating new battle simulations
+```bash
+curl --location 'localhost:3000/api/v1/pokemon' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+
+```
+
 Simple backlog to keep track of the project progress
 
 ### Docs
@@ -123,7 +133,7 @@ Simple backlog to keep track of the project progress
 
 ### Features
 
-1. [ ] Battle Simulation
+1. [x] Battle Simulation
    - [x] add CreateBattleSimulation command handler and implement simulation
    - [x] create new battle with teams and a trainer
    - [x] enforce battle rules required to run simulation until one team looses
@@ -138,7 +148,7 @@ Simple backlog to keep track of the project progress
 ### Nice To Have Features
 
 2. [ ] Add MongoDB service for dev environment
-3. [ ] Add ListAllPokemons query
+3. [x] Add ListAllPokemons query
 4. [ ] Dockerize the battle API
 5. [ ] Add Pokemon Battle GUI for presentation
 6. [ ] Dockerize the battle GUI with reverse proxy

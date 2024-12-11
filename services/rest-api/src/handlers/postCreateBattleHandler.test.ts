@@ -1,4 +1,4 @@
-import { createBattleHandler } from './battleRequestHandler'
+import { postCreateBattleHandler } from './postCreateBattleHandler'
 
 const mockedRes = {
 	status: jest.fn().mockReturnThis(),
@@ -11,7 +11,7 @@ beforeEach(() => {
 	mockedRes.json.mockReset()
 })
 
-describe('createBattleHandler', () => {
+describe('postCreateBattleHandler', () => {
 	test('success', async () => {
 		const mockedReq = {
 			body: {
@@ -21,7 +21,7 @@ describe('createBattleHandler', () => {
 			},
 		}
 
-		await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+		await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 		expect(mockedRes.status).toHaveBeenCalledWith(201)
 		expect(mockedRes.json).toHaveBeenCalledWith({
@@ -50,7 +50,7 @@ describe('invalid payload', () => {
 			const mockedReq = {
 				body: invalid,
 			}
-			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+			await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 			expect(mockedRes.status).toHaveBeenCalledWith(400)
 			expect(mockedRes.json).toHaveBeenCalledWith({
@@ -82,7 +82,7 @@ describe('invalid payload', () => {
 					simulate: true,
 				},
 			}
-			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+			await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 			expect(mockedRes.status).toHaveBeenCalledWith(400)
 			expect(mockedRes.json).toHaveBeenCalledWith({
@@ -116,7 +116,7 @@ describe('invalid payload', () => {
 					simulate: true,
 				},
 			}
-			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+			await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 			expect(mockedRes.status).toHaveBeenCalledWith(400)
 			expect(mockedRes.json).toHaveBeenCalledWith({
@@ -147,7 +147,7 @@ describe('invalid payload', () => {
 					simulate: true,
 				},
 			}
-			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+			await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 			expect(mockedRes.status).toHaveBeenCalledWith(400)
 			expect(mockedRes.json).toHaveBeenCalledWith({
@@ -184,7 +184,7 @@ describe('invalid payload', () => {
 				},
 			}
 
-			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+			await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 			expect(mockedRes.status).toHaveBeenCalledWith(400)
 			expect(mockedRes.json).toHaveBeenCalledWith({
@@ -215,7 +215,7 @@ describe('invalid payload', () => {
 					simulate: true,
 				},
 			}
-			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
+			await postCreateBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
 
 			expect(mockedRes.status).toHaveBeenCalledWith(400)
 			expect(mockedRes.json).toHaveBeenCalledWith({

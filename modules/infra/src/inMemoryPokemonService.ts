@@ -1,29 +1,33 @@
 import {
-	PokemonService,
 	Pokemon,
-} from '@snyggt/pokemon-battle-app/src/createBattleSimulation'
+	PokemonService,
+} from '@snyggt/pokemon-battle-app/src/servicePorts/pokemonService'
 
 export const inMemoryPokemonService: PokemonService = {
+	getAll: async () => {
+		return inMemoryData.map(toApplicationPokemon)
+	},
 	getByIds: async (ids: number[]) =>
 		inMemoryData.reduce((result: Pokemon[], pokemon) => {
 			if (!ids.includes(pokemon.id)) {
 				return result
 			}
-			const applicationPokemon: Pokemon = {
-				pokedexId: pokemon.id,
-				types: pokemon.type,
-				multipliers: pokemon.multipliers || [],
-				weaknesses: pokemon.weaknesses || [],
-				height: pokemon.height,
-				img: pokemon.img,
-				name: pokemon.name,
-				weight: pokemon.weight,
-			}
+			const applicationPokemon: Pokemon = toApplicationPokemon(pokemon)
 
 			return [...result, applicationPokemon]
 		}, [] as Pokemon[]),
 }
 
+const toApplicationPokemon = (pokemon: ExternalServicePokemon): Pokemon => ({
+	pokedexId: pokemon.id,
+	types: pokemon.type,
+	multipliers: pokemon.multipliers || [],
+	weaknesses: pokemon.weaknesses || [],
+	height: pokemon.height,
+	img: pokemon.img,
+	name: pokemon.name,
+	weight: pokemon.weight,
+})
 interface ExternalServicePokemon {
 	id: number
 	num: string

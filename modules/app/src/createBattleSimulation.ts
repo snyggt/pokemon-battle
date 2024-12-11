@@ -4,6 +4,8 @@ import { battle, isBattleEvent } from '@snyggt/pokemon-battle-domain/src/battle'
 import { BattleEvent } from '@snyggt/pokemon-battle-domain/src/events/BattleEvent'
 import { assert } from '@snyggt/pokemon-battle-domain/src/assert'
 import { TeamDto } from '@snyggt/pokemon-battle-domain/src/models/Team'
+import { Services } from './servicePorts'
+import { Pokemon } from './servicePorts/pokemonService'
 
 type CreateBattleSimulationResult =
 	| CreateBattleSimulationSuccess
@@ -246,24 +248,4 @@ interface BattleLogRecord {
 	title: string
 	details: string[]
 	turn: number
-}
-
-// TODO: extract
-export interface Services {
-	pokemonService: PokemonService
-}
-
-export interface PokemonService {
-	getByIds: (id: number[]) => Promise<Pokemon[]>
-}
-
-export interface Pokemon {
-	pokedexId: number
-	types: string[]
-	name: string
-	img: string
-	height: string
-	weight: string
-	multipliers: number[]
-	weaknesses: string[]
 }

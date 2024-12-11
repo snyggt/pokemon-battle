@@ -80,4 +80,11 @@ describe('given a inMemoryPokemonService', () => {
 			expect(faulty.filter(Boolean)).toEqual([])
 		})
 	})
+	describe('when calling getAll', () => {
+		it('then it should return expecte result', async () => {
+			const result = await inMemoryPokemonService.getAll()
+
+			expect(result.length).toBe(151)
+		})
+	})
 })
