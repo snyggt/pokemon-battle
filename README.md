@@ -60,6 +60,16 @@ for `services/rest-api` worspace:
 pnpm run test:api
 ```
 
+### Run lint
+
+Run lint check in all workspaces.
+
+for `services/rest-api` worspace:
+
+```bash
+pnpm run lint
+```
+
 ### Start dev environment
 
 To start all dev environments, (at this point there is only one service `services/rest-api`)

@@ -243,14 +243,6 @@ describe('given a new battle - and battle has started - and home team trainer co
 	})
 })
 
-describe('when adding a valid homeTeam', () => {
-	test('no errors should exist', async () => {
-		const testBattle = battle()
-
-		testBattle.addHomeTeam(team())
-	})
-})
-
 describe('given a new battle -  when adding a valid home team if home team already exists', () => {
 	test('then a error should have been thrown', async () => {
 		const testBattle = battle()

@@ -99,7 +99,7 @@ const generateBattleLog = (events: EventEnvelope<BattleEvent>[]) =>
 					types.includes(weakness)
 				)
 				const weaknessesInformation = matchingWeaknesses.length
-					? `is weak against`
+					? 'is weak against'
 					: 'has no weaknesses against'
 
 				return {
