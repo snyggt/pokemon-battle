@@ -9,7 +9,7 @@ pokemon-battle/
 │ ├── domain/ # workspace
 │ └── app/ # workspace
 │ └── infra/ # workspace
-├── interfaces/
+├── services/
 │ ├── rest-api/ # workspace
 │ ├── **doc-api/** # workspace - Nice to have
 │ └── **web-app/** # workspace - Nice to have
@@ -26,8 +26,6 @@ pokemon-battle/
 One main goal for this project is to keep the structure as simple and clean as possible but still with clear boundaries and separation of concerns.
 
 The solution will take a DDD aproach but only with enough concepts needed to complete the solution.
-
-The domain layer will be using classes for encapsulation and strong data integrity and the rest of the project will be implemented with a more functional coding style.
 
 Each module and interface will be its own workspace with its own dependencies, configuration and lifecycle.
 

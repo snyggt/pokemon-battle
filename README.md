@@ -1,6 +1,11 @@
 # Pokémon Battle Simulator
 
-This is a coding challenge described in [the-challenge.md](/docs/the-challenge.md)
+## Planning
+
+This is a coding challenge described in [challenge.md](/docs/challenge.md)
+
+- Read about the planned structure of this repository here in [structure.md](/docs/structure.md)
+- My interpretations of the challenge is documented in [specification.md](/docs/specification.md)
 
 ## Get started
 
@@ -95,25 +100,20 @@ curl --location 'localhost:3000/api/v1/battle' \
 }'
 ```
 
-## Planning
-
-- Read about the planned structure of this repository here in [project-structure.md](/docs/project-structure.md)
-- My interpretations of the challenge is documented in [project-specification.md](/docs/project-specification.md)
-
 Simple backlog to keep track of the project progress
 
 ### Docs
 
 - [x] Add README.md
-- [x] Add [the-challenge.md](/docs/the-challenge.md) description
+- [x] Add [challenge.md](/docs/challenge.md) description
 - [x] Add sample data [pokedex.json](/docs/sample-data/pokedex.json)
-- [x] Add [project-specification.md](/docs/project-specification.md)
-- [x] Create tasks from [project-specification.md](/docs/project-specification.md)
+- [x] Add [specification.md](/docs/specification.md)
+- [x] Create tasks from [specification.md](/docs/specification.md)
 - [x] Prioritize tasks in README.md based on personal timelimit
 
 ### Boilerplating
 
-- [x] Define project workspace structure [project-structure.md](/docs/project-structure.md)
+- [x] Define project workspace structure [structure.md](/docs/structure.md)
 - [x] setup monorepo structure
 - [x] setup configuration
 - [x] For each workspace
