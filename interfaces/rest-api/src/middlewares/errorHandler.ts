@@ -11,6 +11,7 @@ export const errorHandler = (
 	_next: NextFunction
 ): void => {
 	const status = err.status || 500
-	const message = err.message || 'Internal Server Error'
-	res.status(status).json({ success: false, message })
+	const message = err.message || 'Empty error message'
+	console.error({ status, message }, 'Unexpected error')
+	res.status(status).json({ success: false, message: 'Internal Server Error' })
 }
