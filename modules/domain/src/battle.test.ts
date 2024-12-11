@@ -1,4 +1,11 @@
-import { battle, Team, Pokemon, AttackedEvent } from './battle'
+import {
+	battle,
+	Team,
+	Pokemon,
+	AttackedEvent,
+	assert,
+	isBattleEvent,
+} from './battle'
 
 const validPokemon: (overrides?: Partial<Pokemon>) => Pokemon = ({
 	pokedexId = 2,
@@ -117,8 +124,16 @@ describe('given a new battle - when battle is started - and multiple rounds is p
 		})
 		testBattle.selectTeam('homeTrainer').attack()
 
-		expect(testBattle.battleScores.homeTeam.activePokemon?.health).toBe(24)
-		expect(testBattle.battleScores.ended).toBe(true)
+		const attackEvent = testBattle.events
+			.filter(e => e.type === 'attacked')
+			.pop()
+
+		assert(
+			attackEvent && isBattleEvent(attackEvent, 'attacked'),
+			'Attack event must exist'
+		)
+		expect(attackEvent.payload.attackedByPokemon.health).toBe(24)
+		expect(testBattle.ended).toBe(true)
 	})
 })
 
@@ -195,13 +210,16 @@ describe('given a new battle - when battle is started - combat rules should be a
 			testBattle.addHomeTeam(homeTeam)
 			testBattle.begin()
 
-			const beforeAttack =
-				testBattle.battleScores.awayTeam.activePokemon?.health ?? 0
 			testBattle.selectTeam('homeTeam').attack()
-			const afterAttack =
-				testBattle.battleScores.awayTeam.pokemons?.[0]?.health ?? 0
 
-			expect(beforeAttack - afterAttack).toBe(expectedDamage)
+			const attackEvent = testBattle.events.find(e => e.type === 'attacked')
+
+			assert(
+				attackEvent && isBattleEvent(attackEvent, 'attacked'),
+				'Attack event must exist'
+			)
+
+			expect(attackEvent?.payload.damage).toBe(expectedDamage)
 		}
 	)
 })
