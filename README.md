@@ -20,7 +20,9 @@ cd pokemon-battle
 
 ### Install
 
-Install all dependencies needed for the project, make sure you are standing in the root folder
+**This repository is using pnpm as its package manager.** Follow [install instructions](https://pnpm.io/installation)
+
+Install all dependencies needed for the project, make sure you are standing in the root directory.
 
 ```bash
 pnpm install
@@ -121,7 +123,7 @@ curl --location 'localhost:3000/api/v1/battle' \
 **Query Pokemons**
 
 GET:/api/v1/pokemon
-Query pokemons, use the pokedexId as id for creating new battle simulations
+Query all pokemons
 
 ```bash
 curl --location 'localhost:3000/api/v1/pokemon' \
@@ -130,7 +132,7 @@ curl --location 'localhost:3000/api/v1/pokemon' \
 
 ```
 
-Filter by type, (just one filter is supported right now and the filter is a includes filter)
+Query with filter by type, (just one filter is supported right now)
 
 ```bash
 curl --location 'localhost:3000/api/v1/pokemon?type=fire' \
