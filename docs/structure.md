@@ -4,24 +4,26 @@ This document describes the planned project structure and key concepts.
 
 ## Monorepo structure
 
-pokemon-battle/
-├── modules/
-│ ├── domain/ # workspace
-│ └── app/ # workspace
-│ └── infra/ # workspace
-├── services/
-│ ├── rest-api/ # workspace
-│ ├── **doc-api/** # workspace - Nice to have
-│ └── **web-app/** # workspace - Nice to have
-├── docs/
-│ ├── sample-data/
-│ ├── challenge.md
-│ ├── structure.md
-│ └── specification.md
-├── package.json
-├── pnpm-lock.json
-├── pnpm-worspaces.yaml
-└── README.md
+```bash
+pokemon-battle/ 
+├── modules/ 
+│ ├── domain/ # workspace 
+│ └── app/ # workspace 
+│ └── infra/ # workspace 
+├── services/ 
+│ ├── rest-api/ # workspace 
+│ ├── **doc-api/** # workspace - Nice to have 
+│ └── **web-app/** # workspace - Nice to have 
+├── docs/ 
+│ ├── sample-data/ 
+│ ├── challenge.md 
+│ ├── structure.md 
+│ └── specification.md 
+├── package.json 
+├── pnpm-lock.json 
+├── pnpm-worspaces.yaml 
+└── README.md 
+```
 
 One main goal for this project is to keep the structure as simple and clean as possible but still with clear boundaries and separation of concerns.
 

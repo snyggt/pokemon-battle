@@ -23,7 +23,6 @@
 	"author": "Erik Hansson",
 	"license": "MIT",
 	"devDependencies": {
-		"@snyggt/base": "0.0.2",
 		"@types/express": "^5.0.0",
 		"nodemon": "^3.1.7",
 		"ts-node": "^10.9.2",
