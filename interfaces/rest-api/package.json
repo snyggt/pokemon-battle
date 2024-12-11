@@ -12,13 +12,15 @@
 	},
 	"dependencies": {
 		"@snyggt/pokemon-battle-app": "workspace:*",
-		"@snyggt/pokemon-battle-infra": "workspace:*"
+		"@snyggt/pokemon-battle-infra": "workspace:*",
+		"express": "^4.21.2"
 	},
 	"prettier": "@snyggt/base/prettier",
 	"keywords": [],
 	"author": "Erik Hansson",
 	"license": "MIT",
 	"devDependencies": {
+		"@types/express": "^5.0.0",
 		"tsup": "^8.3.5"
 	}
 }
