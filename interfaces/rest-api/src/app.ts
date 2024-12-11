@@ -5,7 +5,7 @@ import { errorHandler } from './middlewares/errorHandler'
 const app = express()
 
 app.use(express.json())
-app.use('/api/battle', createBattleHandler)
+app.use('/api/v1/battle', createBattleHandler)
 app.use(errorHandler)
 
 export default app
