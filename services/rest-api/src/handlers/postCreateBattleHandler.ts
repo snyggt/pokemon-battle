@@ -18,7 +18,7 @@ const handleCreateBattleSimulationCommand = createBattleSimulationHandler({
 	pokemonService: inMemoryPokemonService,
 })
 
-export const createBattleHandler = async (
+export const postCreateBattleHandler = async (
 	req: Request,
 	res: Response,
 	next: NextFunction

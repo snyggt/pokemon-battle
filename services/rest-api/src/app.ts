@@ -1,11 +1,11 @@
 import express from 'express'
-import { createBattleHandler } from './handlers/battleRequestHandler'
+import { postCreateBattleHandler } from './handlers/postCreateBattleHandler'
 import { errorHandler } from './middlewares/errorHandler'
 
 const app = express()
 
 app.use(express.json())
-app.use('/api/v1/battle', createBattleHandler)
+app.post('/api/v1/battle', postCreateBattleHandler)
 app.use(errorHandler)
 
 export default app
