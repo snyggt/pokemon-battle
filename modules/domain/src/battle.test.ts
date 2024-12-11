@@ -434,8 +434,8 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 		${null}              | ${'Pokemon types field must be an array'}
 		${'invalid'}         | ${'Pokemon types field must be an array'}
 		${[]}                | ${'Pokemon types field must have at least one type'}
-		${['invalid']}       | ${'Pokemon types field must only include the following types: Grass, Poison, Fire, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon'}
-		${['Fire', 'Coder']} | ${'Pokemon types field must only include the following types: Grass, Poison, Fire, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon'}
+		${['invalid']}       | ${'Pokemon types field must only include the following types: Grass, Poison, Fire, Fairy, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon, Dark, Steel'}
+		${['Fire', 'Coder']} | ${'Pokemon types field must only include the following types: Grass, Poison, Fire, Fairy, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon, Dark, Steel'}
 	`(
 		'then a invalid pokemons field types "$invalid" should cause error with message "$expectedError"',
 		async ({ invalid, expectedError }) => {
@@ -462,8 +462,8 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 		invalid              | expectedError
 		${null}              | ${'Optional Pokemon field weaknesses must be an array if defined'}
 		${'invalid'}         | ${'Optional Pokemon field weaknesses must be an array if defined'}
-		${['invalid']}       | ${'Pokemon weaknesses if defined must only include any of the following types: Grass, Poison, Fire, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon'}
-		${['Fire', 'Coder']} | ${'Pokemon weaknesses if defined must only include any of the following types: Grass, Poison, Fire, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon'}
+		${['invalid']}       | ${'Pokemon weaknesses if defined must only include any of the following types: Grass, Poison, Fire, Fairy, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon, Dark, Steel'}
+		${['Fire', 'Coder']} | ${'Pokemon weaknesses if defined must only include any of the following types: Grass, Poison, Fire, Fairy, Flying, Water, Bug, Normal, Electric, Ground, Fighting, Psychic, Rock, Ice, Ghost, Dragon, Dark, Steel'}
 	`(
 		'then a invalid pokemons field weaknesses "$invalid" should cause error with message "$expectedError"',
 		async ({ invalid, expectedError }) => {
@@ -489,8 +489,8 @@ describe('given a new battle - when adding a invalid home and away team', () => 
 		invalid      | expectedError
 		${null}      | ${'Optional Pokemon field multipliers field must be an array if defined'}
 		${'invalid'} | ${'Optional Pokemon field multipliers field must be an array if defined'}
-		${[0]}       | ${'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000'}
-		${[1.3, 0]}  | ${'If Pokemon multipliers is defined it must only include numbers between 0.001 and 5.000'}
+		${[0]}       | ${'If Pokemon multipliers is defined it must only include numbers between 0.001 and 12.000'}
+		${[1.3, 0]}  | ${'If Pokemon multipliers is defined it must only include numbers between 0.001 and 12.000'}
 	`(
 		'then a invalid pokemons field multipliers "$invalid" should cause error with message "$expectedError"',
 		async ({ invalid, expectedError }) => {
