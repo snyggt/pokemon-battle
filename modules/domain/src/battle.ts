@@ -13,17 +13,7 @@ export const battle = () => {
 	const trainerNameByTeam = new Map<TeamType, string>()
 
 	const events: EventEnvelope<BattleEvent>[] = []
-	const addEvent = <T extends BattleEvent>(e: T) => {
-		const eventEnvelope: EventEnvelope<T> = Object.freeze({
-			type: e.type,
-			payload: Object.freeze({ ...e.payload }),
-			id: randomUUID(),
-			revision: events.length + 1,
-			timestamp: new Date(),
-		})
-
-		events.push(eventEnvelope)
-	}
+	const addWithEnvelope = createEventEnveloper(events)
 
 	return {
 		addHomeTeam(team: Team) {
@@ -44,7 +34,7 @@ export const battle = () => {
 				pokemonsById.set(pokemon.id, pokemon)
 			)
 
-			addEvent<TeamJoinedEvent>({
+			addWithEnvelope<TeamJoinedEvent>({
 				type: 'team-joined',
 				payload: {
 					teamType: 'homeTeam',
@@ -71,7 +61,7 @@ export const battle = () => {
 				pokemonsById.set(pokemon.id, pokemon)
 			)
 
-			addEvent<TeamJoinedEvent>({
+			addWithEnvelope<TeamJoinedEvent>({
 				type: 'team-joined',
 				payload: {
 					teamType: 'awayTeam',
@@ -94,7 +84,7 @@ export const battle = () => {
 				attackingTeaam: 'homeTeam',
 			}
 
-			addEvent<StartedEvent>({
+			addWithEnvelope<StartedEvent>({
 				type: 'started',
 				payload: {
 					battleState: {
@@ -195,7 +185,7 @@ export const battle = () => {
 					battleState.turn.count += 1
 					battleState.turn.attackingTeaam = oponentHealthyPokemon.teamType
 
-					addEvent<AttackedEvent>({
+					addWithEnvelope<AttackedEvent>({
 						type: 'attacked',
 						payload: {
 							damage: calculatedDamage,
@@ -210,7 +200,7 @@ export const battle = () => {
 						const awayTeam = pokemonsByTeam.get('awayTeam')
 						assert(homeTeam, 'No homeTeam found')
 						assert(awayTeam, 'No awayTeam found')
-						addEvent<EndedEvent>({
+						addWithEnvelope<EndedEvent>({
 							type: 'ended',
 							payload: {
 								battleState,
@@ -398,6 +388,19 @@ const calculateDamage = (
 	return Math.round(damageAfterMultipliers * (1 + 1.1 * numberOfWeaknesses))
 }
 
+const createEventEnveloper =
+	(events: EventEnvelope<BattleEvent>[]) =>
+	<T extends BattleEvent>(e: T) => {
+		const eventEnvelope: EventEnvelope<T> = Object.freeze({
+			type: e.type,
+			payload: Object.freeze({ ...e.payload }),
+			id: randomUUID(),
+			revision: events.length + 1,
+			timestamp: new Date(),
+		})
+
+		events.push(eventEnvelope)
+	}
 const ended = (pokemonsByTeam: Map<TeamType, BattleActivePokemon[]>) =>
 	[
 		!hasPokemonLeft(pokemonsByTeam.get('awayTeam')),
