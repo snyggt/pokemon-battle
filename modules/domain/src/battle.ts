@@ -25,12 +25,6 @@ export const battle = () => {
 		events.push(eventEnvelope)
 	}
 
-	const ended = () =>
-		[
-			!hasPokemonLeft(pokemonsByTeam.get('awayTeam')),
-			!hasPokemonLeft(pokemonsByTeam.get('homeTeam')),
-		].some(Boolean)
-
 	return {
 		addHomeTeam(team: Team) {
 			assertValidTeam(team)
@@ -128,7 +122,7 @@ export const battle = () => {
 			return battleState.started
 		},
 		get ended() {
-			return ended()
+			return ended(pokemonsByTeam)
 		},
 		get battleScores() {
 			assert(
@@ -140,7 +134,7 @@ export const battle = () => {
 			assert(homeTeam, 'No homeTeam found')
 			assert(awayTeam, 'No awayTeam found')
 			return {
-				ended: ended(),
+				ended: ended(pokemonsByTeam),
 				homeTeam: getTeamSnapshot(homeTeam),
 				awayTeam: getTeamSnapshot(awayTeam),
 			}
@@ -171,7 +165,10 @@ export const battle = () => {
 						team === battleState.turn?.attackingTeaam,
 						'Trainer can only attack on its teams turn'
 					)
-					assert(!ended(), 'Trainer cannot attack if battle has ended')
+					assert(
+						!ended(pokemonsByTeam),
+						'Trainer cannot attack if battle has ended'
+					)
 
 					const oponentHealthyPokemon = oponentTeam.find(
 						pokemon => pokemon.health > 0
@@ -208,7 +205,7 @@ export const battle = () => {
 						},
 					})
 
-					if (ended()) {
+					if (ended(pokemonsByTeam)) {
 						const homeTeam = pokemonsByTeam.get('homeTeam')
 						const awayTeam = pokemonsByTeam.get('awayTeam')
 						assert(homeTeam, 'No homeTeam found')
@@ -400,6 +397,12 @@ const calculateDamage = (
 
 	return Math.round(damageAfterMultipliers * (1 + 1.1 * numberOfWeaknesses))
 }
+
+const ended = (pokemonsByTeam: Map<TeamType, BattleActivePokemon[]>) =>
+	[
+		!hasPokemonLeft(pokemonsByTeam.get('awayTeam')),
+		!hasPokemonLeft(pokemonsByTeam.get('homeTeam')),
+	].some(Boolean)
 
 export const isBattleEvent = <T extends BattleEvent['type']>(
 	e: EventEnvelope<BattleEvent>,
