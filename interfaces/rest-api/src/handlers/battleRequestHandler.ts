@@ -1,4 +1,14 @@
-import { array, Describe, number, string, type, size } from 'superstruct'
+import {
+	array,
+	Describe,
+	number,
+	string,
+	type,
+	size,
+	boolean,
+	optional,
+	define,
+} from 'superstruct'
 import {
 	createBattleSimulationHandler,
 	CreateBattleSimulationCommand,
@@ -37,7 +47,23 @@ export const createBattleHandler = async (
 
 const pokemons = size(array(number()), 3)
 
-const bodySchema: Describe<CreateBattleSimulationCommand> = type({
+interface Options {
+	simulate?: true
+}
+const forceSimulation = () =>
+	define<true>('forceSimulation', (value: true) =>
+		value === true
+			? true
+			: {
+					key: 'simulation',
+					message:
+						'Expected value true, creating battles without simulation is not supported yet',
+					code: 'force-simulation',
+				}
+	)
+
+const bodySchema: Describe<CreateBattleSimulationCommand & Options> = type({
+	simulate: forceSimulation(),
 	awayTeam: type({
 		trainerId: string(),
 		pokemons: pokemons,

@@ -14,7 +14,11 @@ beforeEach(() => {
 describe('createBattleHandler', () => {
 	test('success', async () => {
 		const mockedReq = {
-			body: { homeTeam: validTeam('Erik'), awayTeam: validTeam('Johan') },
+			body: {
+				simulate: true,
+				homeTeam: validTeam('Erik'),
+				awayTeam: validTeam('Johan'),
+			},
 		}
 
 		await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
@@ -37,8 +41,8 @@ describe('invalid payload', () => {
 		${[1]}              | ${'one items number array'}   | ${'Expected an object, but received: 1'}
 		${[1, 2]}           | ${'two items number array'}   | ${'Expected an object, but received: 1,2'}
 		${[1, 2, 3]}        | ${'three items number array'} | ${'Expected an object, but received: 1,2,3'}
-		${''}               | ${'emptyString'}              | ${'Expected an object, but received: \"\"'}
-		${'text'}           | ${'"text" string'}            | ${'Expected an object, but received: \"text\"'}
+		${''}               | ${'emptyString'}              | ${'Expected an object, but received: ""'}
+		${'text'}           | ${'"text" string'}            | ${'Expected an object, but received: "text"'}
 		${Number.MAX_VALUE} | ${'big number'}               | ${'Expected an object, but received: 1.7976931348623157e+308'}
 	`(
 		'[body] "$testDescription" should result in a 400 (Bad Request)',
@@ -75,6 +79,7 @@ describe('invalid payload', () => {
 				body: {
 					awayTeam: { ...validTeam('Erik'), trainerId: invalid },
 					homeTeam: validTeam('Johan'),
+					simulate: true,
 				},
 			}
 			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
@@ -108,6 +113,7 @@ describe('invalid payload', () => {
 				body: {
 					awayTeam: invalid,
 					homeTeam: validTeam('Johan'),
+					simulate: true,
 				},
 			}
 			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
@@ -138,6 +144,7 @@ describe('invalid payload', () => {
 				body: {
 					awayTeam: { ...validTeam('Erik'), pokemons: invalid },
 					homeTeam: validTeam('Johan'),
+					simulate: true,
 				},
 			}
 			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)
@@ -173,6 +180,7 @@ describe('invalid payload', () => {
 				body: {
 					homeTeam: invalid,
 					awayTeam: validTeam('Johan'),
+					simulate: true,
 				},
 			}
 
@@ -204,6 +212,7 @@ describe('invalid payload', () => {
 				body: {
 					homeTeam: { ...validTeam('Erik'), pokemons: invalid },
 					awayTeam: validTeam('Johan'),
+					simulate: true,
 				},
 			}
 			await createBattleHandler(mockedReq as any, mockedRes as any, mockedNext)

@@ -43,7 +43,7 @@ Simple backlog to keep track of the project progress
    - [x] map battle events to BattleLog
    - [x] add PokemonService port to fetch pokemon data to be used to initiate battle
    - [x] implement InMemoryPokemonService adapter that to serve a inmemory pokemon dataset
-   - [ ] implement /api/v1/post/battle {simulate:true}
+   - [x] implement /api/v1/battle {simulate:true}
 
 ### Nice To Have Features
 
