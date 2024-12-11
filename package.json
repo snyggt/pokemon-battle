@@ -6,9 +6,13 @@
   "scripts": {
     "test": "pnpm -r run test",
     "test:domain": "pnpm run --filter '*domain' test",
+    "test:domain:watch": "pnpm run --filter '*domain' test:watch",
     "test:app": "pnpm run --filter '*app' test",
+    "test:app:watch": "pnpm run --filter '*domain' test:watch",
     "test:infra": "pnpm run --filter '*infra' test",
+    "test:infra:watch": "pnpm run --filter '*domain' test:watch",
     "test:api": "pnpm run --filter '*api' test",
+    "test:api:watch": "pnpm run --filter '*domain' test:watch",
     "build": "pnpm -r run build",
     "dev": "pnpm -r run dev",
     "lint": "pnpm -r run lint",
