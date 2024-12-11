@@ -13,6 +13,7 @@ export const battle = () => {
 		started: false,
 		turn: undefined,
 	}
+
 	const lookups: Lookups = {
 		pokemonsById: new Map<string, BattleActivePokemon>(),
 		teamByTrainerName: new Map<string, TeamType>(),
@@ -110,21 +111,6 @@ export const battle = () => {
 		get ended() {
 			return ended(pokemonsByTeam)
 		},
-		get battleScores() {
-			assert(
-				battleState.started,
-				'Game must start before checking battle scores'
-			)
-			const homeTeam = pokemonsByTeam.get('homeTeam')
-			const awayTeam = pokemonsByTeam.get('awayTeam')
-			assert(homeTeam, 'No homeTeam found')
-			assert(awayTeam, 'No awayTeam found')
-			return {
-				ended: ended(pokemonsByTeam),
-				homeTeam: getTeamSnapshot(homeTeam),
-				awayTeam: getTeamSnapshot(awayTeam),
-			}
-		},
 		get currentTurn() {
 			assert(battleState.turn, 'Turn not available until battle is started')
 			return battleState.turn.count
@@ -134,78 +120,27 @@ export const battle = () => {
 		},
 		selectTeam(trainerName: string) {
 			assert(battleState.started, 'Game must start before running team actions')
-			const team = teamByTrainerName.get(trainerName)
-			assert(team, 'No team found')
-			const attackingTeam = pokemonsByTeam.get(team)
 
+			const teamType = teamByTrainerName.get(trainerName)
+			assert(teamType, 'No teamType found')
+
+			const attackingTeam = pokemonsByTeam.get(teamType)
 			const oponentTeam = pokemonsByTeam.get(
-				team === 'homeTeam' ? 'awayTeam' : 'homeTeam'
+				teamType === 'homeTeam' ? 'awayTeam' : 'homeTeam'
 			)
 
 			assert(attackingTeam, 'No attacking team found')
 			assert(oponentTeam, 'No oponentTeam team found')
 
 			return {
-				attack() {
-					assert(
-						team === battleState.turn?.attackingTeaam,
-						'Trainer can only attack on its teams turn'
-					)
-					assert(
-						!ended(pokemonsByTeam),
-						'Trainer cannot attack if battle has ended'
-					)
-
-					const oponentHealthyPokemon = oponentTeam.find(
-						pokemon => pokemon.health > 0
-					)
-
-					const attackingHealthyPokemon = attackingTeam.find(
-						pokemon => pokemon.health > 0
-					)
-
-					assert(oponentHealthyPokemon, 'All oponent pokemons has fainted')
-					assert(attackingHealthyPokemon, 'All oponent pokemons has fainted')
-					assert(battleState.turn, 'All oponent pokemons has fainted')
-
-					const damage = calculateDamage(
-						oponentHealthyPokemon,
-						attackingHealthyPokemon
-					)
-					const calculatedDamage = Math.min(
-						oponentHealthyPokemon.health,
-						damage
-					)
-
-					oponentHealthyPokemon.health -= calculatedDamage
-					battleState.turn.count += 1
-					battleState.turn.attackingTeaam = oponentHealthyPokemon.teamType
-
-					addWithEnvelope<AttackedEvent>({
-						type: 'attacked',
-						payload: {
-							damage: calculatedDamage,
-							turn: battleState.turn.count,
-							attackedPokemon: { ...oponentHealthyPokemon },
-							attackedByPokemon: { ...attackingHealthyPokemon },
-						},
-					})
-
-					if (ended(pokemonsByTeam)) {
-						const homeTeam = pokemonsByTeam.get('homeTeam')
-						const awayTeam = pokemonsByTeam.get('awayTeam')
-						assert(homeTeam, 'No homeTeam found')
-						assert(awayTeam, 'No awayTeam found')
-						addWithEnvelope<EndedEvent>({
-							type: 'ended',
-							payload: {
-								battleState,
-								homeTeam,
-								awayTeam,
-							},
-						})
-					}
-				},
+				attack: createAttackFunction(
+					teamType,
+					battleState,
+					oponentTeam,
+					attackingTeam,
+					addWithEnvelope,
+					lookups
+				),
 			}
 		},
 	}
@@ -217,6 +152,69 @@ export function assert(condition: unknown, message: string): asserts condition {
 	}
 }
 
+const createAttackFunction =
+	(
+		team: TeamType,
+		battleState: BattleState,
+		oponentPokemons: BattleActivePokemon[],
+		attackingPokemons: BattleActivePokemon[],
+		addWithEnvelope: ReturnType<typeof createEventEnveloper>,
+		{ pokemonsByTeam }: Lookups
+	) =>
+	() => {
+		assert(
+			team === battleState.turn?.attackingTeaam,
+			'Trainer can only attack on its teams turn'
+		)
+		assert(!ended(pokemonsByTeam), 'Trainer cannot attack if battle has ended')
+
+		const oponentHealthyPokemon = oponentPokemons.find(
+			pokemon => pokemon.health > 0
+		)
+
+		const attackingHealthyPokemon = attackingPokemons.find(
+			pokemon => pokemon.health > 0
+		)
+
+		assert(oponentHealthyPokemon, 'All oponent pokemons has fainted')
+		assert(attackingHealthyPokemon, 'All oponent pokemons has fainted')
+		assert(battleState.turn, 'All oponent pokemons has fainted')
+
+		const damage = calculateDamage(
+			oponentHealthyPokemon,
+			attackingHealthyPokemon
+		)
+		const calculatedDamage = Math.min(oponentHealthyPokemon.health, damage)
+
+		oponentHealthyPokemon.health -= calculatedDamage
+		battleState.turn.count += 1
+		battleState.turn.attackingTeaam = oponentHealthyPokemon.teamType
+
+		addWithEnvelope<AttackedEvent>({
+			type: 'attacked',
+			payload: {
+				damage: calculatedDamage,
+				turn: battleState.turn.count,
+				attackedPokemon: { ...oponentHealthyPokemon },
+				attackedByPokemon: { ...attackingHealthyPokemon },
+			},
+		})
+
+		if (ended(pokemonsByTeam)) {
+			const homeTeam = pokemonsByTeam.get('homeTeam')
+			const awayTeam = pokemonsByTeam.get('awayTeam')
+			assert(homeTeam, 'No homeTeam found')
+			assert(awayTeam, 'No awayTeam found')
+			addWithEnvelope<EndedEvent>({
+				type: 'ended',
+				payload: {
+					battleState,
+					homeTeam,
+					awayTeam,
+				},
+			})
+		}
+	}
 const toBattleActiveTeam = (team: Team, teamType: 'homeTeam' | 'awayTeam') => ({
 	trainer: {
 		name: team.trainer.name,
@@ -322,15 +320,6 @@ function assertValidTeam(team: unknown): asserts team is Team {
 		'If Pokemon multipliers is defined it must only include numbers between 0.001 and 12.000'
 	)
 }
-
-const getTeamSnapshot = (pokemons: BattleActivePokemon[]) =>
-	Object.freeze({
-		...pokemons,
-		pokemons: pokemons?.map(pokemon => Object.freeze({ ...pokemon })),
-		activePokemon: Object.freeze({
-			...pokemons?.find(p => p.health > 0),
-		}),
-	})
 
 const validPokemonTypes = [
 	'Grass',
