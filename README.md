@@ -34,7 +34,6 @@ Run build scripts on all workspaces.
 pnpm run build
 ```
 
-
 ### Run tests
 
 Run tests in all workspaces. Good for verifying, but it outputs a collapsed summery of all tests
@@ -121,11 +120,20 @@ curl --location 'localhost:3000/api/v1/battle' \
 
 **Query Pokemons**
 
-GET:/api/v1/pokemon 
+GET:/api/v1/pokemon
 Query pokemons, use the pokedexId as id for creating new battle simulations
 
 ```bash
 curl --location 'localhost:3000/api/v1/pokemon' \
+--header 'Accept: application/json' \
+--header 'Content-Type: application/json' \
+
+```
+
+Filter by type, (just one filter is supported right now and the filter is a includes filter)
+
+```bash
+curl --location 'localhost:3000/api/v1/pokemon?type=fire' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 
@@ -170,7 +178,7 @@ Simple backlog to keep track of the project progress
 
 2. [ ] Add MongoDB service for dev environment
 3. [x] Add QeryPokemons endpoint
-3. [ ] Add filter to QueryAllPokemons
-4. [ ] Dockerize the battle API
-5. [ ] Add Pokemon Battle GUI for presentation
-6. [ ] Dockerize the battle GUI with reverse proxy
+4. [x] Add filter to QueryAllPokemons
+5. [ ] Dockerize the battle API
+6. [ ] Add Pokemon Battle GUI for presentation
+7. [ ] Dockerize the battle GUI with reverse proxy

@@ -4,8 +4,13 @@ import {
 } from '@snyggt/pokemon-battle-app/src/servicePorts/pokemonService'
 
 export const inMemoryPokemonService: PokemonService = {
-	getAll: async () => {
-		return inMemoryData.map(toApplicationPokemon)
+	getAll: async filter => {
+		const { typesPattern } = filter ?? {}
+		const pokemons = inMemoryData.map(toApplicationPokemon)
+
+		return typesPattern
+			? pokemons.filter(filterByTypesPattern(typesPattern))
+			: pokemons
 	},
 	getByIds: async (ids: number[]) =>
 		inMemoryData.reduce((result: Pokemon[], pokemon) => {
@@ -17,6 +22,9 @@ export const inMemoryPokemonService: PokemonService = {
 			return [...result, applicationPokemon]
 		}, [] as Pokemon[]),
 }
+
+const filterByTypesPattern = (typesPattern: string) => (pokemon: Pokemon) =>
+	pokemon.types.some(t => t.toLowerCase().includes(typesPattern.toLowerCase()))
 
 const toApplicationPokemon = (pokemon: ExternalServicePokemon): Pokemon => ({
 	pokedexId: pokemon.id,

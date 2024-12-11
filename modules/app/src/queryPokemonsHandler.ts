@@ -7,10 +7,16 @@ interface QueryPokemonResponse {
 	status: 'success'
 }
 
+export interface QueryPokemonFilter {
+	typesPattern?: string
+}
+
 export const createQueryPokemonsHandler = ({ pokemonService }: Services) =>
-	async function queryPokemonsHandler(): Promise<QueryPokemonResponse> {
+	async function queryPokemonsHandler(
+		filter: QueryPokemonFilter
+	): Promise<QueryPokemonResponse> {
 		const pokemons = await pokemonService
-			.getAll()
+			.getAll(filter)
 			.catch(rethrow('Unexpected error calling pokemonService.getAll'))
 
 		return {

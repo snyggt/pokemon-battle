@@ -1,6 +1,10 @@
 export interface PokemonService {
 	getByIds: (id: number[]) => Promise<Pokemon[]>
-	getAll: () => Promise<Pokemon[]>
+	getAll: (filter?: Filter) => Promise<Pokemon[]>
+}
+
+export interface Filter {
+	typesPattern?: string
 }
 
 export interface Pokemon {

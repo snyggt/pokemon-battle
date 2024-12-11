@@ -5,14 +5,27 @@ beforeEach(() => {
 	pokemonService.getAll.mockResolvedValue(mockedPokemons)
 })
 
-describe('given a valid CreateBattleSimulation command', () => {
-	describe('when simulation runs to success without query params', () => {
+describe('given a valid pokemon query', () => {
+	describe('when called without query params', () => {
 		test('then all pokemons should be returned', async () => {
-			const result = await queryPokemons()
+			const result = await queryPokemons({})
 
 			assert(result.status === 'success', 'Status is not success')
 			expect(result.pokemons.length).toBe(mockedPokemons.length)
 		})
+	})
+})
+
+describe('given pokemon service failes', () => {
+	test('then e error with more context should have happend', async () => {
+		const shouldThrow = async () => await queryPokemons({})
+		pokemonService.getAll.mockRejectedValueOnce(
+			new Error('Connection timed out')
+		)
+
+		await expect(shouldThrow).rejects.toThrow(
+			'Unexpected error calling pokemonService.getAll => Connection timed out'
+		)
 	})
 })
 
