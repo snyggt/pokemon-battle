@@ -26,6 +26,15 @@ Install all dependencies needed for the project, make sure you are standing in t
 pnpm install
 ```
 
+### Build
+
+Run build scripts on all workspaces.
+
+```bash
+pnpm run build
+```
+
+
 ### Run tests
 
 Run tests in all workspaces. Good for verifying, but it outputs a collapsed summery of all tests
@@ -110,9 +119,11 @@ curl --location 'localhost:3000/api/v1/battle' \
 }'
 ```
 
-**Get all pokemons**
+**Query Pokemons**
 
-Get all 151 pokemons, use the pokedexId as id for creating new battle simulations
+GET:/api/v1/pokemon 
+Query pokemons, use the pokedexId as id for creating new battle simulations
+
 ```bash
 curl --location 'localhost:3000/api/v1/pokemon' \
 --header 'Accept: application/json' \
@@ -158,7 +169,8 @@ Simple backlog to keep track of the project progress
 ### Nice To Have Features
 
 2. [ ] Add MongoDB service for dev environment
-3. [x] Add ListAllPokemons query
+3. [x] Add QeryPokemons endpoint
+3. [ ] Add filter to QueryAllPokemons
 4. [ ] Dockerize the battle API
 5. [ ] Add Pokemon Battle GUI for presentation
 6. [ ] Dockerize the battle GUI with reverse proxy

@@ -6,6 +6,7 @@ interface QueryPokemonResponse {
 	pokemons: Pokemon[]
 	status: 'success'
 }
+
 export const createQueryPokemonsHandler = ({ pokemonService }: Services) =>
 	async function queryPokemonsHandler(): Promise<QueryPokemonResponse> {
 		const pokemons = await pokemonService

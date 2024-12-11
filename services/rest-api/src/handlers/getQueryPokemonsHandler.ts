@@ -6,7 +6,7 @@ const queryPokemons = createQueryPokemonsHandler({
 	pokemonService: inMemoryPokemonService,
 })
 
-export const getAllPokemonsHandler = async (
+export const getQueryPokemonsHandler = async (
 	_req: Request,
 	res: Response,
 	next: NextFunction

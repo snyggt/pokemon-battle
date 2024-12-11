@@ -1,4 +1,4 @@
-import { getAllPokemonsHandler } from './getAllPokemonsHandler'
+import { getQueryPokemonsHandler } from './getQueryPokemonsHandler'
 
 const mockedRes = {
 	status: jest.fn().mockReturnThis(),
@@ -13,7 +13,7 @@ beforeEach(() => {
 
 describe('getAllPokemonsHandler', () => {
 	test('success', async () => {
-		await getAllPokemonsHandler({} as any, mockedRes as any, mockedNext)
+		await getQueryPokemonsHandler({} as any, mockedRes as any, mockedNext)
 
 		expect(mockedRes.status).toHaveBeenCalledWith(200)
 		expect(mockedRes.json).toHaveBeenCalledWith({
