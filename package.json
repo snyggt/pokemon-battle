@@ -5,6 +5,10 @@
   "private": true,
   "scripts": {
     "test": "pnpm -r run test",
+    "test:domain": "pnpm run --filter '*domain' test",
+    "test:app": "pnpm run --filter '*app' test",
+    "test:infra": "pnpm run --filter '*infra' test",
+    "test:api": "pnpm run --filter '*api' test",
     "build": "pnpm -r run build",
     "dev": "pnpm -r run dev",
     "lint": "pnpm -r run lint",

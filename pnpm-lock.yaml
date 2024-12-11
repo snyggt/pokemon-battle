@@ -33,7 +33,24 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
 
-  interfaces/rest-api:
+  modules/app:
+    dependencies:
+      '@snyggt/pokemon-battle-domain':
+        specifier: workspace:*
+        version: link:../domain
+
+  modules/domain: {}
+
+  modules/infra:
+    dependencies:
+      '@snyggt/pokemon-battle-app':
+        specifier: workspace:*
+        version: link:../app
+      '@snyggt/pokemon-battle-domain':
+        specifier: workspace:*
+        version: link:../domain
+
+  services/rest-api:
     dependencies:
       '@snyggt/pokemon-battle-app':
         specifier: workspace:*
@@ -63,23 +80,6 @@ importers:
       tsup:
         specifier: ^8.3.5
         version: 8.3.5(typescript@5.6.3)
-
-  modules/app:
-    dependencies:
-      '@snyggt/pokemon-battle-domain':
-        specifier: workspace:*
-        version: link:../domain
-
-  modules/domain: {}
-
-  modules/infra:
-    dependencies:
-      '@snyggt/pokemon-battle-app':
-        specifier: workspace:*
-        version: link:../app
-      '@snyggt/pokemon-battle-domain':
-        specifier: workspace:*
-        version: link:../domain
 
 packages:
 
