@@ -61,9 +61,7 @@ describe('given a inMemoryPokemonService', () => {
 			const faulty = await Promise.all(
 				Array(150)
 					.fill('')
-					.map((_, index) => ({
-						pokedexId: index + 1,
-					}))
+					.map((_, index) => index + 1)
 					.map(pokemon =>
 						handler({
 							awayTeam: {

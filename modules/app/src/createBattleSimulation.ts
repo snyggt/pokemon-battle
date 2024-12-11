@@ -1,4 +1,3 @@
-import { EOL } from 'os'
 import { rethrow } from './errorHandling/rethrow'
 import {
 	battle,
@@ -8,11 +7,6 @@ import {
 	EventEnvelope,
 	isBattleEvent,
 } from '@snyggt/pokemon-battle-domain/src/battle'
-
-export interface CreateBattleSimulationCommand {
-	homeTeam: TeamDto
-	awayTeam: TeamDto
-}
 
 type CreateBattleSimulationResult =
 	| CreateBattleSimulationSuccess
@@ -152,7 +146,7 @@ const extractUniquePokemonIds = ({
 	homeTeam,
 }: CreateBattleSimulationCommand) => {
 	const allPokemonIds = [...awayTeam.pokemons, ...homeTeam.pokemons].flatMap(
-		pokemon => pokemon.pokedexId
+		pokemon => pokemon
 	)
 	const uniquePokemonIds = new Set(allPokemonIds)
 	return [...uniquePokemonIds]
@@ -169,10 +163,8 @@ const resolveTeam = ({
 }) => {
 	return {
 		trainer: { name: trainerName },
-		pokemons: command.homeTeam.pokemons.map(pokemonDto => {
-			const pokemon = pokemons.find(
-				pokmeon => pokmeon.pokedexId === pokemonDto.pokedexId
-			)
+		pokemons: command.homeTeam.pokemons.map(pokemonId => {
+			const pokemon = pokemons.find(pokmeon => pokmeon.pokedexId === pokemonId)
 
 			assert(pokemon, 'Pokemon not found in map')
 			return {
@@ -242,9 +234,14 @@ const runSimulation = async ({
 		}
 	}
 }
-interface TeamDto {
+export interface CreateBattleSimulationCommand {
+	homeTeam: TeamDto
+	awayTeam: TeamDto
+}
+
+export interface TeamDto {
 	trainerId: string
-	pokemons: { pokedexId: number }[]
+	pokemons: number[]
 }
 
 interface BattleLogRecord {

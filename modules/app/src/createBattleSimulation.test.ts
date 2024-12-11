@@ -509,11 +509,11 @@ describe('given a valid CreateBattleSimulation command', () => {
 const validCommand: CreateBattleSimulationCommand = {
 	homeTeam: {
 		trainerId: 'homeTrainer',
-		pokemons: [{ pokedexId: 1 }, { pokedexId: 1 }, { pokedexId: 1 }],
+		pokemons: [1, 1, 1],
 	},
 	awayTeam: {
 		trainerId: 'awayTrainer',
-		pokemons: [{ pokedexId: 1 }, { pokedexId: 1 }, { pokedexId: 1 }],
+		pokemons: [1, 1, 1],
 	},
 }
 
