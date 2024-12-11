@@ -86,7 +86,7 @@ curl --location 'localhost:3000/api/v1/battle' \
             66,
             77
         ],
-        "trainerId": "Erik"
+        "trainerName": "Erik"
     },
     "homeTeam": {
         "pokemons": [
@@ -94,7 +94,7 @@ curl --location 'localhost:3000/api/v1/battle' \
             33,
             2
         ],
-        "trainerId": "Johan"
+        "trainerName": "Johan"
     },
     "simulate":true
 }'
