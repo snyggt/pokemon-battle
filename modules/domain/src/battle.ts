@@ -1,17 +1,26 @@
 import { randomUUID } from 'crypto'
 import { panic } from './errorHandling'
 
+interface Lookups {
+	pokemonsById: Map<string, BattleActivePokemon>
+	teamByTrainerName: Map<string, TeamType>
+	pokemonsByTeam: Map<TeamType, BattleActivePokemon[]>
+	trainerNameByTeam: Map<TeamType, string>
+}
 export const battle = () => {
 	const battleState: BattleState = {
 		id: randomUUID(),
 		started: false,
 		turn: undefined,
 	}
-	const pokemonsById = new Map<string, BattleActivePokemon>()
-	const teamByTrainerName = new Map<string, TeamType>()
-	const pokemonsByTeam = new Map<TeamType, BattleActivePokemon[]>()
-	const trainerNameByTeam = new Map<TeamType, string>()
+	const lookups: Lookups = {
+		pokemonsById: new Map<string, BattleActivePokemon>(),
+		teamByTrainerName: new Map<string, TeamType>(),
+		pokemonsByTeam: new Map<TeamType, BattleActivePokemon[]>(),
+		trainerNameByTeam: new Map<TeamType, string>(),
+	}
 
+	const { pokemonsByTeam, teamByTrainerName, trainerNameByTeam } = lookups
 	const events: EventEnvelope<BattleEvent>[] = []
 	const addWithEnvelope = createEventEnveloper(events)
 
@@ -27,12 +36,7 @@ export const battle = () => {
 
 			const battleTeam = toBattleActiveTeam(team, 'homeTeam')
 
-			pokemonsByTeam.set('homeTeam', battleTeam.pokemons)
-			trainerNameByTeam.set('homeTeam', battleTeam.trainer.name)
-			teamByTrainerName.set(battleTeam.trainer.name, 'homeTeam')
-			battleTeam.pokemons.forEach(pokemon =>
-				pokemonsById.set(pokemon.id, pokemon)
-			)
+			addToLookups(battleTeam, 'homeTeam', lookups)
 
 			addWithEnvelope<TeamJoinedEvent>({
 				type: 'team-joined',
@@ -52,14 +56,7 @@ export const battle = () => {
 			assert(!awayTrainer, 'Away team cannot be added twise')
 
 			const battleTeam = toBattleActiveTeam(team, 'awayTeam')
-
-			pokemonsByTeam.set('awayTeam', battleTeam.pokemons)
-			teamByTrainerName.set(battleTeam.trainer.name, 'awayTeam')
-			pokemonsByTeam.set('awayTeam', battleTeam.pokemons)
-			trainerNameByTeam.set('awayTeam', battleTeam.trainer.name)
-			battleTeam.pokemons.forEach(pokemon =>
-				pokemonsById.set(pokemon.id, pokemon)
-			)
+			addToLookups(battleTeam, 'awayTeam', lookups)
 
 			addWithEnvelope<TeamJoinedEvent>({
 				type: 'team-joined',
@@ -72,11 +69,10 @@ export const battle = () => {
 		},
 
 		begin() {
-			assert(pokemonsByTeam.size === 2, 'Battle must have two teams to begin')
 			const awayTeam = pokemonsByTeam.get('awayTeam')
 			const homeTeam = pokemonsByTeam.get('homeTeam')
-			assert(homeTeam, 'Home team missing')
-			assert(awayTeam, 'Away team missing')
+
+			assert(homeTeam && awayTeam, 'Battle must have two teams to begin')
 
 			battleState.started = true
 			battleState.turn = {
@@ -388,6 +384,23 @@ const calculateDamage = (
 	return Math.round(damageAfterMultipliers * (1 + 1.1 * numberOfWeaknesses))
 }
 
+const addToLookups = (
+	battleTeam: BattleTeam,
+	teamType: TeamType,
+	{
+		pokemonsById,
+		pokemonsByTeam,
+		teamByTrainerName,
+		trainerNameByTeam,
+	}: Lookups
+) => {
+	pokemonsByTeam.set(teamType, battleTeam.pokemons)
+	teamByTrainerName.set(battleTeam.trainer.name, teamType)
+	pokemonsByTeam.set(teamType, battleTeam.pokemons)
+	trainerNameByTeam.set(teamType, battleTeam.trainer.name)
+	battleTeam.pokemons.forEach(pokemon => pokemonsById.set(pokemon.id, pokemon))
+}
+
 const createEventEnveloper =
 	(events: EventEnvelope<BattleEvent>[]) =>
 	<T extends BattleEvent>(e: T) => {
@@ -484,6 +497,11 @@ export interface Pokemon {
 
 interface Trainer {
 	name: string
+}
+
+interface BattleTeam {
+	trainer: Trainer
+	pokemons: BattleActivePokemon[]
 }
 
 interface BattleActivePokemon {
