@@ -5,6 +5,7 @@ export default defineConfig({
 	dts: true,
 	format: ['cjs', 'esm'],
 	treeshake: true,
+	bundle: true,
 	platform: 'node',
 	loader: {
 		'.node': 'file',
