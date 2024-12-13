@@ -255,7 +255,7 @@ describe('given a new battle -  when adding a valid home team if home team alrea
 })
 
 describe('given a new battle - when adding a valid away team if away team already exists', () => {
-	test('then a forbidden error should exist', async () => {
+	test('then a error should have been thrown', async () => {
 		const testBattle = battle()
 
 		testBattle.addAwayTeam(team())
@@ -266,7 +266,7 @@ describe('given a new battle - when adding a valid away team if away team alread
 })
 
 describe('given a new battle - when adding home team and away team with same trainer name', () => {
-	test('then a forbidden error should exist', async () => {
+	test('then a error should have been thrown', async () => {
 		const testBattle = battle()
 
 		testBattle.addAwayTeam(team())
@@ -279,7 +279,7 @@ describe('given a new battle - when adding home team and away team with same tra
 })
 
 describe('given a new battle - when adding away team and home team with same trainer name exists', () => {
-	test('then a forbidden error should exist', async () => {
+	test('then a error should have been thrown', async () => {
 		const testBattle = battle()
 
 		testBattle.addHomeTeam(team())
@@ -292,7 +292,7 @@ describe('given a new battle - when adding away team and home team with same tra
 })
 
 describe('given a new battle - when trying to start the battle before both teams exist', () => {
-	test('then a forbidden error should exist', async () => {
+	test('then a error should have been thrown', async () => {
 		const testBattle = battle()
 
 		const shouldThrow = () => testBattle.begin()
