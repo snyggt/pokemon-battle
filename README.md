@@ -44,7 +44,7 @@ Run tests in all workspaces. Good for verifying, but it outputs a collapsed summ
 pnpm run test
 ```
 
-To get a better overview over the test cases; run tests for each workspace
+To get a better overview over the test cases; run tests for each workspace.
 
 for `modules/domain` workspace:
 
@@ -73,8 +73,6 @@ pnpm run test:api
 ### Run lint
 
 Run lint check in all workspaces.
-
-for `services/rest-api` workspace:
 
 ```bash
 pnpm run lint
