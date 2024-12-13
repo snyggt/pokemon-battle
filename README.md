@@ -46,25 +46,25 @@ pnpm run test
 
 To get a better overview over the test cases; run tests for each workspace
 
-for `modules/domain` worspace:
+for `modules/domain` workspace:
 
 ```bash
 pnpm run test:domain
 ```
 
-for `modules/app` worspace:
+for `modules/app` workspace:
 
 ```bash
 pnpm run test:app
 ```
 
-for `modules/infra` worspace:
+for `modules/infra` workspace:
 
 ```bash
 pnpm run test:infra
 ```
 
-for `services/rest-api` worspace:
+for `services/rest-api` workspace:
 
 ```bash
 pnpm run test:api
@@ -74,7 +74,7 @@ pnpm run test:api
 
 Run lint check in all workspaces.
 
-for `services/rest-api` worspace:
+for `services/rest-api` workspace:
 
 ```bash
 pnpm run lint
